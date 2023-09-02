@@ -1,5 +1,5 @@
 import { getErrorResponse } from "@/lib/helper";
-import { prisma } from "@/lib/prisma";
+import prismadb from "@/lib/prisma";
 import { signJWT } from "@/lib/token";
 import { LoginUserInput, LoginUserSchema } from "@/lib/validations/user.schema";
 import { compare } from "bcryptjs";
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as LoginUserInput;
     const data = LoginUserSchema.parse(body);
 
-    const user = await prisma.user.findUnique({
+    const user = await prismadb.user.findUnique({
       where: {
         email: data.email,
       },
@@ -53,6 +53,11 @@ export async function POST(req: NextRequest) {
 
     await Promise.all([
       response.cookies.set(cookieOptions),
+      response.cookies.set({
+        name: "userId",
+        value: user.id,
+        maxAge: tokenMaxAge,
+      }),
       response.cookies.set({
         name: "loggedIn",
         value: "true",

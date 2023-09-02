@@ -1,5 +1,5 @@
 import { getErrorResponse } from "@/lib/helper";
-import { prisma } from "@/lib/prisma";
+import { prismadb } from "@/lib/prisma";
 import {
   RegisterUserInput,
   RegisterUserSchema,
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await hash(data.password, 12);
 
-    const user = await prisma.user.create({
+    const user = await prismadb.user.create({
       data: {
         name: data.name,
         email: data.email,

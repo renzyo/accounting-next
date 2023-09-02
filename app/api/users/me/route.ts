@@ -1,5 +1,5 @@
 import { getErrorResponse } from "@/lib/helper";
-import { prisma } from "@/lib/prisma";
+import prismadb from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const user = await prisma.user.findUnique({
+  const user = await prismadb.user.findUnique({
     where: {
       id: userId,
     },
