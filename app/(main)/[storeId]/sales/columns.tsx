@@ -47,7 +47,7 @@ export const SalesColumns: ColumnDef<SalesColumn>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <span>{row.original.product.name}</span>,
+    cell: ({ row }) => <span>{row.original.product?.name ?? ""}</span>,
   },
   {
     accessorKey: "quantity",

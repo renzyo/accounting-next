@@ -41,8 +41,10 @@ const formSchema = z.object({
 });
 
 const merchants = [
-  { label: "Shopee", value: "shopee" },
-  { label: "Tokopedia", value: "tokopedia" },
+  { label: "Shopee", value: "Shopee" },
+  { label: "Tokopedia", value: "Tokopedia" },
+  { label: "Lazada", value: "Lazada" },
+  { label: "TikTok", value: "TikTok" },
 ] as const;
 
 export const SaleModal = () => {
@@ -84,7 +86,7 @@ export const SaleModal = () => {
       const profit = Number(quantity) * product.price;
       form.setValue("profit", profit.toString());
     }
-  }, [form.watch("quantity"), form.watch("productId")]);
+  }, [productStore.products, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -104,7 +106,10 @@ export const SaleModal = () => {
         toast.success("Product updated successfully");
         saleModalStore.setIsEditing(false);
       } else {
-        await axios.post(`/api/${params.storeId}/sales`, sale);
+        await axios.post(`/api/${params.storeId}/sales`, {
+          ...sale,
+          type: "single",
+        });
         toast.success("Store created successfully");
       }
 

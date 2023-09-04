@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useProduct } from "@/hooks/use-product";
 import { Product } from "@prisma/client";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 const SetProduct = ({ products }: { products: Product[] }) => {
   const productStore = useProduct();

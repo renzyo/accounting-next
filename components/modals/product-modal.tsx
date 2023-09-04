@@ -80,7 +80,10 @@ export const ProductModal = () => {
         toast.success("Product updated successfully");
         productStore.setIsEditing(false);
       } else {
-        await axios.post(`/api/${params.storeId}/products`, product);
+        await axios.post(`/api/${params.storeId}/products`, {
+          ...product,
+          type: "single",
+        });
         toast.success("Store created successfully");
       }
 
