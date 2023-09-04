@@ -1,5 +1,5 @@
 import { getErrorResponse } from "@/lib/helper";
-import { prismadb } from "@/lib/prisma";
+import prismadb from "@/lib/prisma";
 import {
   RegisterUserInput,
   RegisterUserSchema,
