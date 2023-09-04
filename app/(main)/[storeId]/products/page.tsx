@@ -36,7 +36,7 @@ export default async function Product({
           <h2 className="font-semibold text-xl">Produk Toko</h2>
         </div>
         <div className="flex ml-auto">
-          <AddProduct />
+          <AddProduct products={products} />
         </div>
       </header>
       <div className="mt-8">
