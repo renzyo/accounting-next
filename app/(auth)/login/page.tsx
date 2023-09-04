@@ -23,7 +23,7 @@ import { LoginUserSchema } from "@/lib/validations/user.schema";
 
 type loginSchema = z.infer<typeof LoginUserSchema>;
 
-export const Login: React.FC = () => {
+export default function Login() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -124,6 +124,4 @@ export const Login: React.FC = () => {
       </div>
     </section>
   );
-};
-
-export default Login;
+}
