@@ -3,13 +3,14 @@ import { Inter } from "next/font/google";
 import { ModalProvider } from "@/providers/modal-provider";
 
 import "./globals.css";
-import { ToastProvider } from "@/providers/toast-provider";
+import { ToasterProvider } from "@/providers/toaster-provider";
+import { appDesc, appName } from "@/lib/static";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Dashboard",
-  description: "E-Commerce Dashboard",
+  title: appName,
+  description: appDesc,
 };
 
 export default async function RootLayout({
@@ -20,7 +21,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ToastProvider />
+        <ToasterProvider />
         <ModalProvider />
         {children}
       </body>

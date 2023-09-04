@@ -19,20 +19,16 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { LoginUserSchema } from "@/lib/validations/user.schema";
 
-const loginFormSchema = z.object({
-  email: z.string().min(1),
-  password: z.string().min(1),
-});
-
-type loginSchema = z.infer<typeof loginFormSchema>;
+type loginSchema = z.infer<typeof LoginUserSchema>;
 
 export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const form = useForm<loginSchema>({
-    resolver: zodResolver(loginFormSchema),
+    resolver: zodResolver(LoginUserSchema),
     defaultValues: {
       email: "",
       password: "",

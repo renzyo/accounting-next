@@ -1,7 +1,8 @@
 import prismadb from "@/lib/prisma";
 import { cookies } from "next/headers";
-import MainNav from "./main-nav";
+import { MainNav } from "./main-nav";
 import StoreSwitcher from "./store-switcher";
+import UserButton from "./user-button";
 
 export const Navbar = async () => {
   const cookieStore = cookies();
@@ -19,7 +20,7 @@ export const Navbar = async () => {
         <StoreSwitcher items={stores} />
         <MainNav className="mx-6" />
         <div className="ml-auto flex items-center space-x-4">
-          <div>User Button</div>
+          <UserButton />
         </div>
       </div>
     </div>

@@ -54,7 +54,7 @@ model Sales {
   productId String
   product   Product  @relation("ProductToSales", fields: [productId], references: [id])
   quantity  Int
-  price     Float
+  profit    Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

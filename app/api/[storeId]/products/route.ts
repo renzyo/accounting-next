@@ -1,11 +1,14 @@
 import prismadb from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { storeId: string } }
+) {
   try {
     const userId = req.cookies.get("userId")?.value;
     const body = await req.json();
-    const { name } = body;
+    const { name, description, price, stock } = body;
 
     if (!userId) {
       return new NextResponse(
@@ -37,17 +40,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const store = await prismadb.store.create({
+    const product = await prismadb.product.create({
       data: {
+        storeId: params.storeId,
         name,
-        userId: userId as string,
+        description,
+        price,
+        stock,
       },
     });
 
     return new NextResponse(
       JSON.stringify({
         status: "success",
-        data: store,
+        data: product,
       }),
       {
         status: 201,
