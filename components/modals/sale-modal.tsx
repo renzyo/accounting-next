@@ -20,17 +20,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { useParams, useRouter } from "next/navigation";
 import { useSaleModal } from "@/hooks/use-sale-modal";
-import { cn } from "@/lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "../ui/command";
 import { useProduct } from "@/hooks/use-product";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const formSchema = z.object({
   id: z.string().min(1),
@@ -58,7 +55,13 @@ export const SaleModal = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: saleModalStore.isEditing
-      ? saleModalStore.saleData
+      ? {
+          ...saleModalStore.saleData,
+          profit: saleModalStore.saleData?.profit
+            .replaceAll(".", "")
+            .replaceAll(",00", "")
+            .replaceAll("Rp ", ""),
+        }
       : {
           merchant: "",
           productId: "",
@@ -69,24 +72,30 @@ export const SaleModal = () => {
 
   useEffect(() => {
     if (saleModalStore.isEditing) {
+      const profit = saleModalStore.saleData?.profit
+        .replaceAll(".", "")
+        .replaceAll(",00", "")
+        .replaceAll("Rp ", "");
       form.setValue("merchant", saleModalStore.saleData?.merchant ?? "");
       form.setValue("productId", saleModalStore.saleData?.productId ?? "");
       form.setValue("quantity", saleModalStore.saleData?.quantity ?? "");
-      form.setValue("profit", saleModalStore.saleData?.profit ?? "");
+      form.setValue("profit", profit ?? "");
     }
   }, [saleModalStore.isEditing, saleModalStore.saleData, form]);
 
+  const formProductId = form.watch("productId");
+  const formQuantity = form.watch("quantity");
+
   useEffect(() => {
-    const quantity = form.watch("quantity");
     const product = productStore.products.find(
-      (product) => product.id === form.watch("productId")
+      (product) => product.id === formProductId
     );
 
-    if (quantity && product) {
-      const profit = Number(quantity) * product.price;
+    if (formQuantity && product && product.price !== 0) {
+      const profit = Number(formQuantity) * product.price;
       form.setValue("profit", profit.toString());
     }
-  }, [productStore.products, form]);
+  }, [productStore.products, formProductId, formQuantity, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -103,21 +112,21 @@ export const SaleModal = () => {
           `/api/${params.storeId}/sales/${saleModalStore.saleData?.id}`,
           sale
         );
-        toast.success("Product updated successfully");
+        toast.success("Penjualan berhasil diperbaharui");
         saleModalStore.setIsEditing(false);
       } else {
         await axios.post(`/api/${params.storeId}/sales`, {
           ...sale,
           type: "single",
         });
-        toast.success("Store created successfully");
+        toast.success("Penjualan berhasil ditambahkan");
       }
 
       saleModalStore.onClose();
       form.reset();
       router.refresh();
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error("Terjadi kesalahan pada server.");
     } finally {
       setLoading(false);
     }
@@ -125,11 +134,13 @@ export const SaleModal = () => {
 
   return (
     <Modal
-      title={saleModalStore.isEditing ? "Edit Produk" : "Tambah Produk"}
+      title={
+        saleModalStore.isEditing ? "Perbaharui Penjualan" : "Tambah Penjualan"
+      }
       description={
         saleModalStore.isEditing
-          ? "Perbaharui produk yang sudah ada."
-          : "Tambahkan produk baru ke toko."
+          ? "Perbaharui penjualan yang sudah ada."
+          : "Tambahkan penjualan baru ke toko."
       }
       isOpen={saleModalStore.isOpen}
       onClose={() => {
@@ -152,54 +163,27 @@ export const SaleModal = () => {
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Merchant</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih Merchant..." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {merchants.map((merchant) => (
+                            <SelectItem
+                              value={merchant.value}
+                              key={merchant.value}
+                              placeholder="Pilih Merchant..."
                             >
-                              {field.value
-                                ? merchants.find(
-                                    (merchant) => merchant.value === field.value
-                                  )?.label
-                                : "Pilih merchant"}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="p-0">
-                          <Command>
-                            <CommandInput placeholder="Search framework..." />
-                            <CommandEmpty>Tidak ada produk.</CommandEmpty>
-                            <CommandGroup>
-                              {merchants.map((merchant) => (
-                                <CommandItem
-                                  value={merchant.label}
-                                  key={merchant.value}
-                                  onSelect={() => {
-                                    form.setValue("merchant", merchant.value);
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      merchant.value === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {merchant.label}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
+                              {merchant.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -210,54 +194,27 @@ export const SaleModal = () => {
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Produk</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih Produk..." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {productStore.products.map((product) => (
+                            <SelectItem
+                              value={product.id}
+                              key={product.id}
+                              placeholder="Pilih produk..."
                             >
-                              {field.value
-                                ? productStore.products.find(
-                                    (product) => product.id === field.value
-                                  )?.name
-                                : "Pilih Produk"}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="p-0">
-                          <Command>
-                            <CommandInput placeholder="Cari produk..." />
-                            <CommandEmpty>Tidak ada produk.</CommandEmpty>
-                            <CommandGroup>
-                              {productStore.products.map((product) => (
-                                <CommandItem
-                                  value={product.id}
-                                  key={product.id}
-                                  onSelect={() => {
-                                    form.setValue("productId", product.id);
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      product.id === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {product.name}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
+                              {product.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -289,7 +246,13 @@ export const SaleModal = () => {
                         <FormLabel>Pendapatan</FormLabel>
                         <FormControl>
                           <Input
-                            disabled={true}
+                            disabled={
+                              productStore.products.find(
+                                (product) => product.id === formProductId
+                              )?.price === 0
+                                ? false
+                                : true
+                            }
                             placeholder="Pendapatan"
                             type="number"
                             {...field}
@@ -322,8 +285,8 @@ export const SaleModal = () => {
                     }}
                   >
                     {saleModalStore.isEditing
-                      ? "Perbaharui Produk"
-                      : "Tambahkan Produk"}
+                      ? "Perbaharui Penjualan"
+                      : "Tambahkan Penjualan"}
                   </Button>
                 </div>
               </form>

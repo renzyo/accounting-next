@@ -77,21 +77,21 @@ export const ProductModal = () => {
           `/api/${params.storeId}/products/${productStore.productData?.id}`,
           product
         );
-        toast.success("Product updated successfully");
+        toast.success("Produk berhasil diperbaharui");
         productStore.setIsEditing(false);
       } else {
         await axios.post(`/api/${params.storeId}/products`, {
           ...product,
           type: "single",
         });
-        toast.success("Store created successfully");
+        toast.success("Produk berhasil ditambahkan");
       }
 
       productStore.onClose();
       form.reset();
       router.refresh();
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error("Terjadi kesalahan pada server.");
     } finally {
       setLoading(false);
     }

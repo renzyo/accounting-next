@@ -39,6 +39,13 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { Product } from "@prisma/client";
 import { toast } from "react-hot-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   merchant: z.string().min(1),
@@ -342,55 +349,27 @@ const ImportPage = () => {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Merchant</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          disabled={loading}
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "justify-between",
-                            !field.value && "text-muted-foreground"
-                          )}
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih Merchant..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {merchants.map((merchant) => (
+                        <SelectItem
+                          value={merchant.value}
+                          key={merchant.value}
+                          placeholder="Pilih Merchant..."
                         >
-                          {field.value
-                            ? merchants.find(
-                                (merchant) => merchant.value === field.value
-                              )?.label
-                            : "Pilih merchant"}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0">
-                      <Command>
-                        <CommandInput placeholder="Search framework..." />
-                        <CommandEmpty>Tidak ada produk.</CommandEmpty>
-                        <CommandGroup>
-                          {merchants.map((merchant) => (
-                            <CommandItem
-                              value={merchant.label}
-                              key={merchant.value}
-                              onSelect={() => {
-                                form.setValue("merchant", merchant.value);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  merchant.value === field.value
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                              {merchant.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                          {merchant.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
