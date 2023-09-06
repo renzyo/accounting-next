@@ -307,7 +307,6 @@ const ImportPage = () => {
         }[] = [];
 
         salesData.forEach((sale) => {
-          console.log(response.data);
           const product = (response.data as Product[]).find(
             (myProduct: Product) =>
               myProduct.name.toLowerCase() === sale.name.toLowerCase()
@@ -334,7 +333,6 @@ const ImportPage = () => {
         toast.success("Sales imported successfully");
         window.location.assign(`/${params.storeId}/sales`);
       } catch (error) {
-        console.log(error);
         toast.error("Something went wrong");
       } finally {
         setLoading(false);

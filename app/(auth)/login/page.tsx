@@ -45,7 +45,6 @@ export default function Login() {
       }
     } catch (error: any) {
       toast.error("Email or password is incorrect");
-      console.log(error);
     } finally {
       setLoading(false);
     }

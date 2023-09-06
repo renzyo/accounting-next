@@ -66,7 +66,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuItem
             onClick={() => {
               productModal.setIsEditing(true);
-              productModal.setProductData({ ...data, id: data.id });
+              productModal.setProductData({ ...data, id: data.id, imageUrl: data.image });
               productModal.onOpen();
             }}
           >

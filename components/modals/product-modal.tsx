@@ -62,7 +62,6 @@ export const ProductModal = () => {
   }, [productStore.isEditing, productStore.productData, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("Submitted");
     try {
       setLoading(true);
 
@@ -75,9 +74,13 @@ export const ProductModal = () => {
       formData.append("stockThreshold", values.stockThreshold);
       formData.append("stock", values.stock);
 
-      console.log(formData);
 
       if (productStore.isEditing) {
+        formData.append(
+          "previousImage",
+          productStore.productData?.imageUrl ?? ""
+        );
+
         await axios.put(
           `/api/${params.storeId}/products/${productStore.productData?.id}`,
           formData,

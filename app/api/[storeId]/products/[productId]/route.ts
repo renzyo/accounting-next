@@ -10,6 +10,7 @@ export async function PUT(
   try {
     const userId = req.cookies.get("userId")?.value;
     const formData = await req.formData();
+    const previousImage = formData.get("previousImage") as string;
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const stockThreshold = parseInt(formData.get("stockThreshold") as string);
@@ -59,7 +60,7 @@ export async function PUT(
       );
     }
 
-    let imageUrl = "/uploads/default.jpg";
+    let imageUrl = "";
 
     if (image !== null) {
       const bytes = await image.arrayBuffer();
@@ -75,29 +76,17 @@ export async function PUT(
       );
 
       imageUrl = `/uploads/${newFileName}`;
-    }
-
-    console.log(imageUrl);
-
-    const oldProduct = await prismadb.product.findUnique({
-      where: {
-        id: params.productId as string,
-      },
-    });
-
-    if (oldProduct?.imageUrl && imageUrl !== oldProduct?.imageUrl) {
-      if (oldProduct?.imageUrl !== "/uploads/default.jpg") {
-        await fs.unlink(
-          path.join(process.cwd(), "public", oldProduct?.imageUrl as string)
-        );
-      }
-
-      imageUrl = imageUrl;
     } else {
-      imageUrl = oldProduct?.imageUrl as string;
+      imageUrl = previousImage;
     }
 
-    console.log(imageUrl);
+    if (imageUrl !== previousImage) {
+      if (previousImage !== "/uploads/default.jpg") {
+        await fs.unlink(path.join(process.cwd(), "public", previousImage));
+      }
+    } else {
+      imageUrl = previousImage;
+    }
 
     const product = await prismadb.product.update({
       where: {

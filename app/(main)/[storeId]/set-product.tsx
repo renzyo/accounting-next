@@ -9,7 +9,6 @@ const SetProduct = ({ products }: { products: Product[] }) => {
   const productStore = useProduct();
 
   useEffect(() => {
-    console.log("set product");
     productStore.setProducts(products);
   }, []);
 

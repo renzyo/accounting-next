@@ -9,7 +9,6 @@ const SetMerchant = ({ merchants }: { merchants: Merchant[] }) => {
   const merchantStore = useMerchantList();
 
   useEffect(() => {
-    console.log("set product");
     merchantStore.setMerchantList(merchants);
   }, []);
 
