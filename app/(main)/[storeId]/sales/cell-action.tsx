@@ -33,7 +33,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onConfirmDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/sales/${data.id}`);
+      await axios.delete(`/api/${params.storeId}/sales/${data.id}`, {
+        data: {
+          productId: data.product.id,
+          quantity: parseInt(data.quantity),
+        },
+      });
       toast.success("Sales berhasil dihapus.");
       router.refresh();
     } catch (error) {

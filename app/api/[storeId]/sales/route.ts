@@ -62,6 +62,38 @@ export async function POST(
         );
       }
 
+      const product = await prismadb.product.findUnique({
+        where: {
+          id: productId,
+        },
+      });
+
+      if (product?.stock! !== 0) {
+        if (product?.stock! < quantity) {
+          return new NextResponse(
+            JSON.stringify({
+              status: "error",
+              message: "You do not have enough stock.",
+            }),
+            {
+              status: 400,
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        }
+
+        await prismadb.product.update({
+          where: {
+            id: productId,
+          },
+          data: {
+            stock: product?.stock! - quantity,
+          },
+        });
+      }
+
       const sales = await prismadb.sales.create({
         data: {
           storeId: params.storeId,

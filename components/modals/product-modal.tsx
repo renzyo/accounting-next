@@ -87,6 +87,7 @@ export const ProductModal = () => {
             },
           }
         );
+
         toast.success("Produk berhasil diperbaharui");
         productStore.setIsEditing(false);
       } else {
@@ -97,13 +98,14 @@ export const ProductModal = () => {
             "Content-Type": "multipart/form-data",
           },
         });
+
         toast.success("Produk berhasil ditambahkan");
       }
 
-      productStore.onClose();
+      router.refresh();
       setFile(null);
       form.reset();
-      router.refresh();
+      productStore.onClose();
     } catch (error) {
       toast.error("Terjadi kesalahan pada server.");
     } finally {

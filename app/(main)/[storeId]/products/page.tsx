@@ -3,6 +3,7 @@ import { Package } from "lucide-react";
 import { ProductColumn, ProductColumns } from "./columns";
 import prismadb from "@/lib/prisma";
 import AddProduct from "./add-product-button";
+import SetProduct from "../set-product";
 
 export default async function Product({
   params,
@@ -36,6 +37,7 @@ export default async function Product({
           <h2 className="font-semibold text-xl">Produk Toko</h2>
         </div>
         <div className="flex ml-auto">
+          <SetProduct products={products} />
           <AddProduct products={products} />
         </div>
       </header>

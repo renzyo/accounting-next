@@ -148,6 +148,7 @@ export async function POST(
       const product = await prismadb.product.createMany({
         data: products.map((product: any) => ({
           storeId: params.storeId,
+          imageUrl: product.imageUrl,
           name: product.name,
           description: product.description,
           stockThreshold: product.stockThreshold,

@@ -79,6 +79,8 @@ export async function DELETE(
 ) {
   try {
     const userId = req.cookies.get("userId")?.value;
+    const body = await req.json();
+    const { productId, quantity } = body;
 
     if (!userId) {
       return new NextResponse(
@@ -116,6 +118,21 @@ export async function DELETE(
         }
       );
     }
+
+    const product = await prismadb.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    await prismadb.product.update({
+      where: {
+        id: productId,
+      },
+      data: {
+        stock: product?.stock! + quantity,
+      },
+    });
 
     await prismadb.sales.delete({
       where: {

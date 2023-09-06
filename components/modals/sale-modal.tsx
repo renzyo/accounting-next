@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { useMerchantList } from "@/hooks/use-merchant-list-modal";
+import { ScrollArea } from "../ui/scroll-area";
 
 const formSchema = z.object({
   id: z.string().min(1),
@@ -181,15 +182,17 @@ export const SaleModal = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {productStore.products.map((product) => (
-                            <SelectItem
-                              value={product.id}
-                              key={product.id}
-                              placeholder="Pilih produk..."
-                            >
-                              {product.name}
-                            </SelectItem>
-                          ))}
+                          <ScrollArea className="h-[200px]">
+                            {productStore.products.map((product) => (
+                              <SelectItem
+                                value={product.id}
+                                key={product.id}
+                                placeholder="Pilih produk..."
+                              >
+                                {product.name}
+                              </SelectItem>
+                            ))}
+                          </ScrollArea>
                         </SelectContent>
                       </Select>
                       <FormMessage />

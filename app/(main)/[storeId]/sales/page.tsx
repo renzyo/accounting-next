@@ -4,6 +4,7 @@ import { SalesColumn, SalesColumns } from "./columns";
 import prismadb from "@/lib/prisma";
 import AddSale from "./add-sale-button";
 import ImportSale from "./import-sale";
+import SetProduct from "../set-product";
 
 export default async function Sales({
   params,
@@ -24,6 +25,12 @@ export default async function Sales({
     },
   });
 
+  const products = await prismadb.product.findMany({
+    where: {
+      storeId,
+    },
+  });
+
   const formattedSales: SalesColumn[] = sales.map((sales) => ({
     id: sales.id,
     merchant: sales.merchant,
@@ -39,6 +46,7 @@ export default async function Sales({
           <h2 className="font-semibold text-xl">Penjualan Toko</h2>
         </div>
         <div className="flex ml-auto gap-4">
+          <SetProduct products={products} />
           <AddSale />
           <ImportSale />
         </div>
