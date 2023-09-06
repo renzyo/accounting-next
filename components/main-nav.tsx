@@ -28,6 +28,11 @@ export function MainNav({
       label: "Penjualan",
       active: pathname === `/${params.storeId}/sales`,
     },
+    {
+      href: `/${params.storeId}/test-ftp`,
+      label: "Test FTP",
+      active: pathname === `/${params.storeId}/test-ftp`,
+    },
   ];
 
   return (
