@@ -34,7 +34,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     try {
       setLoading(true);
       await axios.delete(`/api/${params.storeId}/sales/${data.id}`);
-      toast.success("Product deleted.");
+      toast.success("Sales berhasil dihapus.");
       router.refresh();
     } catch (error) {
       toast.error("Something went wrong");
@@ -65,9 +65,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             onClick={() => {
               saleModalStore.setIsEditing(true);
               saleModalStore.setSaleData({
-                ...data,
                 id: data.id,
+                merchantId: data.merchant.id,
                 productId: data.product.id,
+                quantity: data.quantity.toString(),
               });
               saleModalStore.onOpen();
             }}

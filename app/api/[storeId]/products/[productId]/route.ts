@@ -1,3 +1,5 @@
+import fs from "fs/promises";
+import path from "path";
 import prismadb from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,35 +9,33 @@ export async function PUT(
 ) {
   try {
     const userId = req.cookies.get("userId")?.value;
-    const body = await req.json();
-    const { name, description, price, stock } = body;
+    const formData = await req.formData();
+    const name = formData.get("name") as string;
+    const description = formData.get("description") as string;
+    const stockThreshold = parseInt(formData.get("stockThreshold") as string);
+    const stock = parseInt(formData.get("stock") as string);
+    const image: File | null = formData.get("image") as unknown as File;
 
     if (!userId) {
-      return new NextResponse(
-        JSON.stringify({
+      return NextResponse.json(
+        {
           status: "error",
           message: "You are not authorized to access this route.",
-        }),
+        },
         {
           status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
         }
       );
     }
 
     if (!name) {
-      return new NextResponse(
-        JSON.stringify({
+      return NextResponse.json(
+        {
           status: "error",
-          message: "Please provide a name for your store.",
-        }),
+          message: "Please provide a name.",
+        },
         {
           status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
         }
       );
     }
@@ -48,45 +48,83 @@ export async function PUT(
     });
 
     if (!store) {
-      return new NextResponse(
-        JSON.stringify({
+      return NextResponse.json(
+        {
           status: "error",
           message: "You are not authorized to access this route.",
-        }),
+        },
         {
           status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
         }
       );
     }
+
+    let imageUrl = "/uploads/default.jpg";
+
+    if (image !== null) {
+      const bytes = await image.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const fileName = image.name;
+      const fileExtension = fileName.split(".").pop();
+      const newFileName = `${Date.now()}.${fileExtension}`;
+
+      await fs.writeFile(
+        path.join(process.cwd(), "public", "uploads", newFileName),
+        buffer
+      );
+
+      imageUrl = `/uploads/${newFileName}`;
+    }
+
+    console.log(imageUrl);
+
+    const oldProduct = await prismadb.product.findUnique({
+      where: {
+        id: params.productId as string,
+      },
+    });
+
+    if (oldProduct?.imageUrl && imageUrl !== oldProduct?.imageUrl) {
+      if (oldProduct?.imageUrl !== "/uploads/default.jpg") {
+        await fs.unlink(
+          path.join(process.cwd(), "public", oldProduct?.imageUrl as string)
+        );
+      }
+
+      imageUrl = imageUrl;
+    } else {
+      imageUrl = oldProduct?.imageUrl as string;
+    }
+
+    console.log(imageUrl);
 
     const product = await prismadb.product.update({
       where: {
         id: params.productId as string,
       },
       data: {
+        imageUrl,
         name,
         description,
-        price,
+        stockThreshold,
         stock,
       },
     });
 
-    return new NextResponse(
-      JSON.stringify({
-        status: "success",
-        data: product,
-      }),
+    return NextResponse.json({ success: true, product });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
       {
-        status: 201,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        status: "error",
+        message: "Something went wrong.",
+      },
+      {
+        status: 500,
       }
     );
-  } catch (error) {}
+  }
 }
 
 export async function DELETE(
@@ -130,6 +168,18 @@ export async function DELETE(
             "Content-Type": "application/json",
           },
         }
+      );
+    }
+
+    const product = await prismadb.product.findUnique({
+      where: {
+        id: params.productId as string,
+      },
+    });
+
+    if (product?.imageUrl && product?.imageUrl !== "/uploads/default.jpg") {
+      await fs.unlink(
+        path.join(process.cwd(), "public", product?.imageUrl as string)
       );
     }
 

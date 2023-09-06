@@ -25,7 +25,7 @@ const formSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   description: z.string().min(1),
-  price: z.string().min(1),
+  stockThreshold: z.string().min(1),
   stock: z.string().min(1),
 });
 
@@ -34,6 +34,7 @@ export const ProductModal = () => {
   const params = useParams();
   const router = useRouter();
 
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,20 +44,19 @@ export const ProductModal = () => {
       : {
           name: "",
           description: "",
-          price: "",
+          stockThreshold: "",
           stock: "",
         },
   });
 
   useEffect(() => {
     if (productStore.isEditing) {
-      const price = productStore.productData?.price
-        .replace(".", "")
-        .replace(",00", "")
-        .replace("Rp ", "");
       form.setValue("name", productStore.productData?.name ?? "");
       form.setValue("description", productStore.productData?.description ?? "");
-      form.setValue("price", price ?? "");
+      form.setValue(
+        "stockThreshold",
+        productStore.productData?.stockThreshold ?? ""
+      );
       form.setValue("stock", productStore.productData?.stock ?? "");
     }
   }, [productStore.isEditing, productStore.productData, form]);
@@ -65,29 +65,43 @@ export const ProductModal = () => {
     console.log("Submitted");
     try {
       setLoading(true);
-      const product = {
-        name: values.name,
-        description: values.description,
-        price: parseInt(values.price),
-        stock: parseInt(values.stock),
-      };
+
+      const formData = new FormData();
+      if (file) {
+        formData.append("image", file as File);
+      }
+      formData.append("name", values.name);
+      formData.append("description", values.description);
+      formData.append("stockThreshold", values.stockThreshold);
+      formData.append("stock", values.stock);
+
+      console.log(formData);
 
       if (productStore.isEditing) {
         await axios.put(
           `/api/${params.storeId}/products/${productStore.productData?.id}`,
-          product
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
         toast.success("Produk berhasil diperbaharui");
         productStore.setIsEditing(false);
       } else {
-        await axios.post(`/api/${params.storeId}/products`, {
-          ...product,
-          type: "single",
+        formData.append("type", "single");
+
+        await axios.post(`/api/${params.storeId}/products`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         });
         toast.success("Produk berhasil ditambahkan");
       }
 
       productStore.onClose();
+      setFile(null);
       form.reset();
       router.refresh();
     } catch (error) {
@@ -137,6 +151,22 @@ export const ProductModal = () => {
                     </FormItem>
                   )}
                 />
+                <FormItem>
+                  <FormLabel>Gambar Produk</FormLabel>
+                  <FormControl>
+                    <Input
+                      name="image"
+                      type="file"
+                      accept="image/*"
+                      disabled={loading}
+                      placeholder="Gambar Produk"
+                      onChange={(event: any) => {
+                        setFile(event.target.files?.[0] ?? null);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
                 <FormField
                   control={form.control}
                   name="description"
@@ -156,14 +186,14 @@ export const ProductModal = () => {
                 />
                 <FormField
                   control={form.control}
-                  name="price"
+                  name="stockThreshold"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Harga Produk</FormLabel>
+                      <FormLabel>Batas Stok</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="Harga Produk"
+                          placeholder="Batas Stok"
                           type="number"
                           {...field}
                         />
@@ -177,11 +207,11 @@ export const ProductModal = () => {
                   name="stock"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Stok Produk</FormLabel>
+                      <FormLabel>Stok</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="Stok Produk"
+                          placeholder="Stok"
                           type="number"
                           {...field}
                         />

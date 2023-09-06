@@ -7,7 +7,7 @@ interface useProductModalStore {
     id: string;
     name: string;
     description: string;
-    price: string;
+    stockThreshold: string;
     stock: string;
   };
   onOpen: () => void;
@@ -17,7 +17,7 @@ interface useProductModalStore {
     id: string;
     name: string;
     description: string;
-    price: string;
+    stockThreshold: string;
     stock: string;
   }) => void;
 }

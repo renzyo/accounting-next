@@ -1,14 +1,8 @@
 "use client";
 
-import {
-  Check,
-  ChevronsUpDown,
-  FileSpreadsheet,
-  Loader2,
-  LoaderIcon,
-} from "lucide-react";
+import { FileSpreadsheet, Loader2 } from "lucide-react";
 import { FileUploader } from "react-drag-drop-files";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import * as z from "zod";
 import { FormProvider, useForm } from "react-hook-form";
@@ -21,19 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
 import { useProduct } from "@/hooks/use-product";
 import axios from "axios";
 import { useParams } from "next/navigation";
@@ -46,27 +27,47 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useMerchantList } from "@/hooks/use-merchant-list-modal";
 
 const formSchema = z.object({
-  merchant: z.string().min(1),
+  merchantId: z.string().min(1),
 });
 
-const merchants = [
-  { label: "Shopee", value: "Shopee" },
-  { label: "Tokopedia", value: "Tokopedia" },
-  { label: "Lazada", value: "Lazada" },
-  { label: "TikTok", value: "TikTok" },
-] as const;
-
 type SaleData = {
+  merchantId: string;
   name: string;
   quantity: number;
-  profit: number;
+};
+
+type MerchantData = {
+  id: string;
+  name: string;
 };
 
 const ImportPage = () => {
   const productStore = useProduct();
+  const merchantListStore = useMerchantList();
   const params = useParams();
+  const [merchants, setMerchants] = useState<MerchantData[]>(
+    [] as MerchantData[]
+  );
+
+  useEffect(() => {
+    const shopee = merchantListStore.merchantList?.find(
+      (merchant) => merchant.name === "Shopee"
+    )!;
+    const tokped = merchantListStore.merchantList?.find(
+      (merchant) => merchant.name === "Tokopedia"
+    )!;
+    const lazada = merchantListStore.merchantList?.find(
+      (merchant) => merchant.name === "Lazada"
+    )!;
+    const tiktok = merchantListStore.merchantList?.find(
+      (merchant) => merchant.name === "TikTok"
+    )!;
+
+    setMerchants([shopee, tokped, lazada, tiktok]);
+  }, [merchantListStore.merchantList]);
 
   const [selectedFile, setSelectedFile] = useState<File>();
   const [loading, setLoading] = useState(false);
@@ -74,7 +75,7 @@ const ImportPage = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      merchant: "",
+      merchantId: "",
     },
   });
 
@@ -87,25 +88,25 @@ const ImportPage = () => {
     const reader = new FileReader();
     reader.readAsArrayBuffer(selectedFile as File);
     reader.onload = async (e) => {
-      const filename = selectedFile?.name;
+      // const filename = selectedFile?.name;
       const data = new Uint8Array(e.target?.result as ArrayBuffer);
       const workbook = XLSX.read(data, { type: "array" });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const sales = XLSX.utils.sheet_to_json(sheet);
       const salesData: SaleData[] = [];
-      let marketplace = "";
 
-      if (values.merchant === "Lazada") {
-        if (!filename?.toLowerCase().includes("lazada")) return;
+      if (
+        values.merchantId ===
+        merchants.find((merchant) => merchant.name === "Lazada")?.id
+      ) {
+        // if (!filename?.toLowerCase().includes("lazada")) return;
         let i = 0;
         sales.forEach((sale: unknown) => {
           if (i > 2) {
             const saleData = sale as object;
             let name = "";
             let sold = 0;
-            let profit = 0;
-            marketplace = "Lazada";
 
             // loop saleData
             let j = 0;
@@ -114,58 +115,61 @@ const ImportPage = () => {
                 name = value as string;
               } else if (j === 13) {
                 sold = parseInt(value as string);
-              } else if (j === 14) {
-                profit = parseInt(value);
+                // } else if (j === 14) {
+                //   profit = parseInt(value);
               }
               j++;
             }
 
             const tempSale: SaleData = {
+              merchantId: values.merchantId,
               name,
               quantity: sold,
-              profit,
             };
-            salesData.push(tempSale);
+            if (tempSale.quantity !== 0) salesData.push(tempSale);
           }
           i++;
         });
-      } else if (values.merchant === "Shopee") {
-        if (!filename?.toLowerCase().includes("shopee")) return;
+      } else if (
+        values.merchantId ===
+        merchants.find((merchant) => merchant.name === "Shopee")?.id
+      ) {
+        // if (!filename?.toLowerCase().includes("shopee")) return;
         sales.forEach((sale: unknown) => {
           const saleData = sale as object;
           let name = "";
           let sold = 0;
-          let profit = 0;
-          marketplace = "Shopee";
 
           for (const [key, value] of Object.entries(saleData)) {
             if (key === "Produk") {
               name = value as string;
             } else if (key === "Total Produk Dibayar") {
               sold = parseInt(value as string);
-            } else if (key === "Total Penjualan (Pesanan Dibayar) (IDR)") {
-              profit = value;
-              profit = parseInt(profit.toString().replace(/\./g, ""));
+              // } else if (key === "Total Penjualan (Pesanan Dibayar) (IDR)") {
+              //   profit = value;
+              //   profit = parseInt(profit.toString().replace(/\./g, ""));
             }
           }
 
           const tempSale: SaleData = {
+            merchantId: values.merchantId,
             name,
             quantity: sold,
-            profit,
           };
-          salesData.push(tempSale);
+
+          if (tempSale.quantity !== 0) salesData.push(tempSale);
         });
-      } else if (values.merchant === "TikTok") {
-        if (!filename?.toLowerCase().includes("tiktok")) return;
+      } else if (
+        values.merchantId ===
+        merchants.find((merchant) => merchant.name === "TikTok")?.id
+      ) {
+        // if (!filename?.toLowerCase().includes("tiktok")) return;
         let i = 0;
         sales.forEach((sale: unknown) => {
           if (i > 0) {
             const saleData = sale as object;
             let name = "";
             let sold = 0;
-            let profit = 0;
-            marketplace = "TikTok";
 
             // loop saleData
             let j = 0;
@@ -174,28 +178,32 @@ const ImportPage = () => {
                 name = value as string;
               } else if (j === 4) {
                 sold = parseInt(value as string);
-              } else if (j === 2) {
-                profit = value;
-                profit = parseInt(
-                  profit.toString().replace("Rp", "").replace(/\./g, "")
-                );
+                // } else if (j === 2) {
+                //   profit = value;
+                //   profit = parseInt(
+                //     profit.toString().replace("Rp", "").replace(/\./g, "")
+                //   );
               }
               j++;
             }
 
             const tempSale: SaleData = {
+              merchantId: values.merchantId,
               name,
               quantity: sold,
-              profit,
             };
-            salesData.push(tempSale);
+
+            if (tempSale.quantity !== 0) salesData.push(tempSale);
           }
           i++;
         });
-      } else if (values.merchant === "Tokopedia") {
-        if (!filename?.toLowerCase().includes("tokped")) return;
+      } else if (
+        values.merchantId ===
+        merchants.find((merchant) => merchant.name === "Tokopedia")?.id
+      ) {
+        // if (!filename?.toLowerCase().includes("tokped")) return;
         const filteredSales: object[] = [];
-        marketplace = "Tokopedia";
+
         let i = 0;
         sales.forEach((sale: unknown) => {
           if (i > 2) {
@@ -224,35 +232,36 @@ const ImportPage = () => {
 
           const name = saleData["__EMPTY_6" as keyof typeof saleData] as string;
           const sold = 0;
-          const profit = parseInt(
-            saleData["__EMPTY_22" as keyof typeof saleData]
-          ) as number;
+          // const profit = parseInt(
+          //   saleData["__EMPTY_22" as keyof typeof saleData]
+          // ) as number;
 
           const isInList = tempSales.find((sale) => sale.name === name);
           if (!isInList) {
             tempSales.push({
+              merchantId: values.merchantId,
               name: name,
               quantity: sold,
-              profit: profit,
             } as SaleData);
-          } else {
-            tempSales.forEach((sale) => {
-              if (sale.name === name) {
-                sale.profit = (sale.profit ?? 0) + profit;
-              }
-            });
+            // } else {
+            //   tempSales.forEach((sale) => {
+            //     if (sale.name === name) {
+            //       sale.profit = (sale.profit ?? 0) + profit;
+            //     }
+            //   });
           }
         });
 
         tempSales.forEach((sale) => {
-          salesData.push(sale);
+          if (sale.quantity !== 0) salesData.push(sale);
         });
       }
 
       let newProductList: {
         name: string;
+        imageUrl: string;
         description: string;
-        price: number;
+        stockThreshold: number;
         stock: number;
       }[] = [];
 
@@ -263,33 +272,38 @@ const ImportPage = () => {
           );
 
           if (!product) {
-            if (sale.profit !== 0) {
-              const newProduct = {
-                name: sale.name,
-                description: "",
-                price: 0,
-                stock: 0,
-              };
+            // if (sale.profit !== 0) {
+            const newProduct = {
+              name: sale.name,
+              imageUrl: "/uploads/default.jpg",
+              description: "",
+              stockThreshold: 0,
+              stock: 0,
+            };
 
-              newProductList.push(newProduct);
-            }
+            newProductList.push(newProduct);
+            // }
           }
         });
 
         if (newProductList.length > 0) {
-          await axios.post(`/api/${params.storeId}/products`, {
-            products: newProductList,
-            type: "bulk",
+          const formData = new FormData();
+          formData.append("products", JSON.stringify(newProductList));
+          formData.append("type", "bulk");
+
+          await axios.post(`/api/${params.storeId}/products`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           });
         }
 
         const response = await axios.get(`/api/${params.storeId}/products`);
 
         const newSalesList: {
-          merchant: string;
+          merchantId: string;
           productId: string;
           quantity: number;
-          profit: number;
         }[] = [];
 
         salesData.forEach((sale) => {
@@ -300,16 +314,15 @@ const ImportPage = () => {
           );
 
           if (product) {
-            if (sale.profit !== 0) {
-              const newSale = {
-                merchant: values.merchant,
-                productId: product.id,
-                quantity: sale.quantity,
-                profit: sale.profit,
-              };
+            // if (sale.profit !== 0) {
+            const newSale = {
+              merchantId: values.merchantId,
+              productId: product.id,
+              quantity: sale.quantity,
+            };
 
-              newSalesList.push(newSale);
-            }
+            newSalesList.push(newSale);
+            // }
           }
         });
 
@@ -345,7 +358,7 @@ const ImportPage = () => {
           >
             <FormField
               control={form.control}
-              name="merchant"
+              name="merchantId"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Merchant</FormLabel>
@@ -361,11 +374,11 @@ const ImportPage = () => {
                     <SelectContent>
                       {merchants.map((merchant) => (
                         <SelectItem
-                          value={merchant.value}
-                          key={merchant.value}
+                          value={merchant.id}
+                          key={merchant.id}
                           placeholder="Pilih Merchant..."
                         >
-                          {merchant.label}
+                          {merchant.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

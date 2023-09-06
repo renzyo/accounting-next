@@ -45,7 +45,7 @@ export async function POST(
     const { type } = body;
 
     if (type === "single") {
-      const { merchant, productId, quantity, profit } = body;
+      const { merchantId, productId, quantity } = body;
 
       if (!userId) {
         return new NextResponse(
@@ -65,10 +65,9 @@ export async function POST(
       const sales = await prismadb.sales.create({
         data: {
           storeId: params.storeId,
-          merchant,
+          merchantId,
           productId: productId,
           quantity,
-          profit,
         },
       });
 
@@ -107,10 +106,9 @@ export async function POST(
           return prismadb.sales.create({
             data: {
               storeId: params.storeId,
-              merchant: sale.merchant,
+              merchantId: sale.merchantId,
               productId: sale.productId,
               quantity: sale.quantity,
-              profit: sale.profit,
             },
           });
         })

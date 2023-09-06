@@ -3,7 +3,6 @@ import { Package } from "lucide-react";
 import { ProductColumn, ProductColumns } from "./columns";
 import prismadb from "@/lib/prisma";
 import AddProduct from "./add-product-button";
-import { formatter } from "@/lib/utils";
 
 export default async function Product({
   params,
@@ -22,9 +21,10 @@ export default async function Product({
 
   const formattedProduct: ProductColumn[] = products.map((product) => ({
     id: product.id,
+    image: product.imageUrl ?? "",
     name: product.name,
     description: product.description ?? "-",
-    price: formatter.format(product.price),
+    stockThreshold: product.stockThreshold.toString(),
     stock: product.stock.toString(),
   }));
 

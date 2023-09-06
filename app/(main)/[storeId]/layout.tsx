@@ -5,6 +5,7 @@ import { Navbar } from "@/components/navbar";
 import prismadb from "@/lib/prisma";
 import { appDesc, appName } from "@/lib/static";
 import SetProduct from "./set-product";
+import SetMerchant from "./set-merchant";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,10 +27,13 @@ const RootLayout = async ({
     },
   });
 
+  const merchants = await prismadb.merchant.findMany();
+
   return (
     <>
       <Navbar />
       <SetProduct products={products} />
+      <SetMerchant merchants={merchants} />
       {children}
     </>
   );

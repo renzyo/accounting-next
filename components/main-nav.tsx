@@ -15,7 +15,7 @@ export function MainNav({
   const routes = [
     {
       href: `/${params.storeId}`,
-      label: "Overview",
+      label: "Dashboard",
       active: pathname === `/${params.storeId}`,
     },
     {
@@ -27,11 +27,6 @@ export function MainNav({
       href: `/${params.storeId}/sales`,
       label: "Penjualan",
       active: pathname === `/${params.storeId}/sales`,
-    },
-    {
-      href: `/${params.storeId}/test-ftp`,
-      label: "Test FTP",
-      active: pathname === `/${params.storeId}/test-ftp`,
     },
   ];
 

@@ -4,14 +4,13 @@ import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { CellAction } from "./cell-action";
-import { Product } from "@prisma/client";
+import { Merchant, Product } from "@prisma/client";
 
 export type SalesColumn = {
   id: string;
-  merchant: string;
+  merchant: Merchant;
   product: Product;
   quantity: string;
-  profit: string;
 };
 
 export const SalesColumns: ColumnDef<SalesColumn>[] = [
@@ -33,6 +32,7 @@ export const SalesColumns: ColumnDef<SalesColumn>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => <span>{row.original.merchant?.name ?? ""}</span>,
   },
   {
     accessorKey: "product",
@@ -58,20 +58,6 @@ export const SalesColumns: ColumnDef<SalesColumn>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Unit Terjual
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "profit",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Pendapatan
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );

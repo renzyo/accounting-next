@@ -8,7 +8,7 @@ export async function PUT(
   try {
     const userId = req.cookies.get("userId")?.value;
     const body = await req.json();
-    const { merchant, productId, quantity, profit } = body;
+    const { merchantId, productId, quantity } = body;
 
     if (!userId) {
       return new NextResponse(
@@ -52,10 +52,9 @@ export async function PUT(
         id: params.salesId as string,
       },
       data: {
-        merchant,
+        merchantId,
         productId,
         quantity,
-        profit,
       },
     });
 

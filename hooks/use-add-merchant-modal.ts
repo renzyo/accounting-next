@@ -1,30 +1,23 @@
 import { create } from "zustand";
 
-interface useSaleModalStore {
+interface useAddMerchantModalStore {
   isOpen: boolean;
   isEditing: boolean;
-  saleData?: {
+  merchantData?: {
     id: string;
-    merchantId: string;
-    productId: string;
-    quantity: string;
+    name: string;
   };
   onOpen: () => void;
   onClose: () => void;
   setIsEditing: (isEditing: boolean) => void;
-  setSaleData: (saleData: {
-    id: string;
-    merchantId: string;
-    productId: string;
-    quantity: string;
-  }) => void;
+  setMerchantData: (merchantData: { id: string; name: string }) => void;
 }
 
-export const useSaleModal = create<useSaleModalStore>((set) => ({
+export const useAddMerchantModal = create<useAddMerchantModalStore>((set) => ({
   isOpen: false,
   isEditing: false,
   onOpen: () => set({ isOpen: true }),
   onClose: () => set({ isOpen: false }),
   setIsEditing: (isEditing) => set({ isEditing }),
-  setSaleData: (saleData) => set({ saleData }),
+  setMerchantData: (merchantData) => set({ merchantData }),
 }));

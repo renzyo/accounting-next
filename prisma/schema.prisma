@@ -34,27 +34,34 @@ model Store {
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  storeId     String
-  store       Store    @relation("StoreToProduct", fields: [storeId], references: [id])
-  name        String
-  description String?
-  price       Float
-  stock       Int      @default(0)
-  sales       Sales[]  @relation("ProductToSales")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(uuid())
+  storeId        String
+  store          Store    @relation("StoreToProduct", fields: [storeId], references: [id])
+  imageUrl       String?
+  name           String
+  description    String?
+  stock          Int      @default(0)
+  stockThreshold Int      @default(0)
+  sales          Sales[]  @relation("ProductToSales")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Merchant {
+  id    String  @id @default(uuid())
+  name  String
+  Sales Sales[]
 }
 
 model Sales {
-  id        String   @id @default(uuid())
-  merchant  String
-  storeId   String
-  store     Store    @relation("StoreToSales", fields: [storeId], references: [id])
-  productId String
-  product   Product  @relation("ProductToSales", fields: [productId], references: [id])
-  quantity  Int
-  profit    Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(uuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  storeId    String
+  store      Store    @relation("StoreToSales", fields: [storeId], references: [id])
+  productId  String
+  product    Product  @relation("ProductToSales", fields: [productId], references: [id])
+  quantity   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

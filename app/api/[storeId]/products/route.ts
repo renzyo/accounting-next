@@ -1,3 +1,5 @@
+import fs from "fs/promises";
+import path from "path";
 import prismadb from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -41,18 +43,39 @@ export async function POST(
 ) {
   try {
     const userId = req.cookies.get("userId")?.value;
-    const body = await req.json();
-    const { type } = body;
+    const body = await req.formData();
+    const type = body.get("type") as string;
 
     if (type === "single") {
-      const { name, description, price, stock } = body;
+      const name = body.get("name") as string;
+      const description = body.get("description") as string;
+      const stockThreshold = parseInt(body.get("stockThreshold") as string);
+      const stock = parseInt(body.get("stock") as string);
+      const image: File | null = body.get("image") as unknown as File;
+      let imageUrl = "/uploads/default.jpg";
+
+      if (image) {
+        const bytes = await image.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        const fileName = image.name;
+        const fileExtension = fileName.split(".").pop();
+        const newFileName = `${Date.now()}.${fileExtension}`;
+
+        await fs.writeFile(
+          path.join(process.cwd(), "public", "uploads", newFileName),
+          buffer
+        );
+
+        imageUrl = `/uploads/${newFileName}`;
+      }
 
       if (!userId) {
-        return new NextResponse(
-          JSON.stringify({
+        return NextResponse.json(
+          {
             status: "error",
             message: "You are not authorized to access this route.",
-          }),
+          },
           {
             status: 401,
             headers: {
@@ -80,34 +103,24 @@ export async function POST(
       const product = await prismadb.product.create({
         data: {
           storeId: params.storeId,
+          imageUrl,
           name,
           description,
-          price,
+          stockThreshold,
           stock,
         },
       });
 
-      return new NextResponse(
-        JSON.stringify({
-          status: "success",
-          data: product,
-        }),
-        {
-          status: 201,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      return NextResponse.json({ success: true, product });
     } else if (type === "bulk") {
-      const { products } = body;
+      const products = JSON.parse(body.get("products") as string);
 
       if (!userId) {
-        return new NextResponse(
-          JSON.stringify({
+        return NextResponse.json(
+          {
             status: "error",
             message: "You are not authorized to access this route.",
-          }),
+          },
           {
             status: 401,
             headers: {
@@ -118,11 +131,11 @@ export async function POST(
       }
 
       if (!products) {
-        return new NextResponse(
-          JSON.stringify({
+        return NextResponse.json(
+          {
             status: "error",
-            message: "Please provide an array of products.",
-          }),
+            message: "Please provide a name for your store.",
+          },
           {
             status: 400,
             headers: {
@@ -137,37 +150,18 @@ export async function POST(
           storeId: params.storeId,
           name: product.name,
           description: product.description,
-          price: product.price,
+          stockThreshold: product.stockThreshold,
           stock: product.stock,
         })),
       });
 
-      return new NextResponse(
-        JSON.stringify({
-          status: "success",
-          data: product,
-        }),
-        {
-          status: 201,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      return NextResponse.json({ success: true, products: product });
     }
   } catch (error) {
     console.error(error);
-    return new NextResponse(
-      JSON.stringify({
-        status: "error",
-        message: "Something went wrong.",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+    return NextResponse.json(
+      { error: "Something went wrong." },
+      { status: 500 }
     );
   }
 }

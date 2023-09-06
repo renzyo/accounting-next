@@ -3,7 +3,6 @@ import { BadgeDollarSign } from "lucide-react";
 import { SalesColumn, SalesColumns } from "./columns";
 import prismadb from "@/lib/prisma";
 import AddSale from "./add-sale-button";
-import { formatter } from "@/lib/utils";
 import ImportSale from "./import-sale";
 
 export default async function Sales({
@@ -21,6 +20,7 @@ export default async function Sales({
     },
     include: {
       product: true,
+      merchant: true,
     },
   });
 
@@ -29,7 +29,6 @@ export default async function Sales({
     merchant: sales.merchant,
     product: sales.product,
     quantity: sales.quantity.toString(),
-    profit: formatter.format(sales.profit),
   }));
 
   return (
