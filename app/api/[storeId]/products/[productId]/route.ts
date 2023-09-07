@@ -179,16 +179,16 @@ export async function DELETE(
       },
     });
 
-    if (product?.imageId && product?.imageId !== "default") {
-      const fileRef = ref(storage, `products/${product.imageId}`);
-      await deleteObject(fileRef);
-    }
-
     await prismadb.product.delete({
       where: {
         id: params.productId as string,
       },
     });
+
+    if (product?.imageId && product?.imageId !== "default") {
+      const fileRef = ref(storage, `products/${product.imageId}`);
+      await deleteObject(fileRef);
+    }
 
     return new NextResponse(
       JSON.stringify({
