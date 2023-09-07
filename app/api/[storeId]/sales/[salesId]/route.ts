@@ -8,7 +8,7 @@ export async function PUT(
   try {
     const userId = req.cookies.get("userId")?.value;
     const body = await req.json();
-    const { merchantId, productId, quantity } = body;
+    const { merchantId, productId, quantity, previousQuantity } = body;
 
     if (!userId) {
       return new NextResponse(
@@ -47,7 +47,37 @@ export async function PUT(
       );
     }
 
-    const product = await prismadb.sales.update({
+    const oldProduct = await prismadb.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    await prismadb.product.update({
+      where: {
+        id: productId,
+      },
+      data: {
+        stock: oldProduct?.stock! + previousQuantity,
+      },
+    });
+
+    const product = await prismadb.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    await prismadb.product.update({
+      where: {
+        id: productId,
+      },
+      data: {
+        stock: product?.stock! - quantity,
+      },
+    });
+
+    const sales = await prismadb.sales.update({
       where: {
         id: params.salesId as string,
       },
@@ -61,7 +91,7 @@ export async function PUT(
     return new NextResponse(
       JSON.stringify({
         status: "success",
-        data: product,
+        data: sales,
       }),
       {
         status: 201,
@@ -70,7 +100,20 @@ export async function PUT(
         },
       }
     );
-  } catch (error) {}
+  } catch (error) {
+    return new NextResponse(
+      JSON.stringify({
+        status: "error",
+        message: "Something went wrong.",
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
 }
 
 export async function DELETE(

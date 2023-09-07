@@ -78,7 +78,10 @@ export const SaleModal = () => {
       if (saleModalStore.isEditing) {
         await axios.put(
           `/api/${params.storeId}/sales/${saleModalStore.saleData?.id}`,
-          sale
+          {
+            ...sale,
+            previousQuantity: saleModalStore.saleData?.quantity,
+          }
         );
         toast.success("Penjualan berhasil diperbaharui");
         saleModalStore.setIsEditing(false);
@@ -94,7 +97,9 @@ export const SaleModal = () => {
       form.reset();
       router.refresh();
     } catch (error) {
-      toast.error("Terjadi kesalahan pada server.");
+      toast.error(
+        "Tidak dapat menambahkan penjualan. Pastikan stok produk mencukupi."
+      );
     } finally {
       setLoading(false);
     }
