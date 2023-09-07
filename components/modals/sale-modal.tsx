@@ -80,7 +80,7 @@ export const SaleModal = () => {
           `/api/${params.storeId}/sales/${saleModalStore.saleData?.id}`,
           {
             ...sale,
-            previousQuantity: saleModalStore.saleData?.quantity,
+            previousQuantity: parseInt(saleModalStore.saleData?.quantity!),
           }
         );
         toast.success("Penjualan berhasil diperbaharui");
