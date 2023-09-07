@@ -6,6 +6,7 @@ import prismadb from "@/lib/prisma";
 import { appDesc, appName } from "@/lib/static";
 import SetProduct from "./set-product";
 import SetMerchant from "./set-merchant";
+import { ModalProvider } from "@/providers/modal-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,6 +32,7 @@ const RootLayout = async ({
 
   return (
     <>
+      <ModalProvider />
       <Navbar />
       <SetProduct products={products} />
       <SetMerchant merchants={merchants} />
