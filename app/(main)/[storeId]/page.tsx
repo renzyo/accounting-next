@@ -3,6 +3,7 @@ import { Overview } from "@/components/overview";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import prismadb from "@/lib/prisma";
 import {
@@ -78,38 +79,42 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
                 <CardTitle>Notifikasi</CardTitle>
               </CardHeader>
               <CardContent>
-                {isProductStockLow ? (
-                  products.map((product) => {
-                    if (product.stock <= product.stockThreshold) {
-                      return (
-                        <div
-                          key={product.id}
-                          className="flex items-center gap-4 border-2 p-4 bg-red-200 rounded-lg border-red-200"
-                        >
-                          <AlertOctagonIcon className="w-6 h-6 text-red-500" />
-                          <div className="flex flex-col">
-                            <div className="text-lg">
-                              Produk {product.name} hampir habis.
+                <ScrollArea className="h-[450px]">
+                  <div className="flex flex-col gap-4">
+                    {isProductStockLow ? (
+                      products.map((product) => {
+                        if (product.stock <= product.stockThreshold) {
+                          return (
+                            <div
+                              key={product.id}
+                              className="flex items-center gap-4 border-2 p-4 bg-red-200 rounded-lg border-red-200"
+                            >
+                              <AlertOctagonIcon className="w-6 h-6 text-red-500" />
+                              <div className="flex flex-col">
+                                <div className="text-lg">
+                                  Produk {product.name} hampir habis.
+                                </div>
+                                <div className="text-sm">
+                                  Produk {product.name} tersisa {product.stock}{" "}
+                                  buah.
+                                </div>
+                              </div>
                             </div>
-                            <div className="text-sm">
-                              Produk {product.name} tersisa {product.stock}{" "}
-                              buah.
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    }
+                          );
+                        }
 
-                    return null;
-                  })
-                ) : (
-                  <div className="flex items-center gap-4 border-2 p-4 bg-green-200 rounded-lg border-green-200">
-                    <CheckCircle className="w-6 h-6 text-green-500" />
-                    <div className="flex flex-col">
-                      <div className="text-lg">Semua produk tersedia.</div>
-                    </div>
+                        return null;
+                      })
+                    ) : (
+                      <div className="flex items-center gap-4 border-2 p-4 bg-green-200 rounded-lg border-green-200">
+                        <CheckCircle className="w-6 h-6 text-green-500" />
+                        <div className="flex flex-col">
+                          <div className="text-lg">Semua produk tersedia.</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                </ScrollArea>
               </CardContent>
             </Card>
           </div>
