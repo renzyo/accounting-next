@@ -5,6 +5,7 @@ interface useProductModalStore {
   isEditing: boolean;
   productData?: {
     id: string;
+    imageId: string;
     imageUrl: string;
     name: string;
     description: string;
@@ -16,6 +17,7 @@ interface useProductModalStore {
   setIsEditing: (isEditing: boolean) => void;
   setProductData: (productData: {
     id: string;
+    imageId: string;
     imageUrl: string;
     name: string;
     description: string;

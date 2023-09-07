@@ -74,10 +74,13 @@ export const ProductModal = () => {
       formData.append("stockThreshold", values.stockThreshold);
       formData.append("stock", values.stock);
 
-
       if (productStore.isEditing) {
         formData.append(
-          "previousImage",
+          "previousImageId",
+          productStore.productData?.imageId ?? ""
+        );
+        formData.append(
+          "previousImageUrl",
           productStore.productData?.imageUrl ?? ""
         );
 

@@ -5,6 +5,7 @@ const nextConfig = {
       "images.unsplash.com",
       "localhost",
       "management.lanyardcustombandung.com",
+      "firebasestorage.googleapis.com",
     ],
   },
 };

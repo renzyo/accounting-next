@@ -2,6 +2,13 @@ import fs from "fs/promises";
 import path from "path";
 import prismadb from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
+import { storage } from "@/lib/firebase";
 
 export async function PUT(
   req: NextRequest,
@@ -10,7 +17,8 @@ export async function PUT(
   try {
     const userId = req.cookies.get("userId")?.value;
     const formData = await req.formData();
-    const previousImage = formData.get("previousImage") as string;
+    const previousImageId = formData.get("previousImageId") as string;
+    const previousImageUrl = formData.get("previousImageUrl") as string;
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const stockThreshold = parseInt(formData.get("stockThreshold") as string);
@@ -60,6 +68,7 @@ export async function PUT(
       );
     }
 
+    let imageId = "";
     let imageUrl = "";
 
     if (image !== null) {
@@ -70,22 +79,25 @@ export async function PUT(
       const fileExtension = fileName.split(".").pop();
       const newFileName = `${Date.now()}.${fileExtension}`;
 
-      await fs.writeFile(
-        path.join(process.cwd(), "public", "uploads", newFileName),
-        buffer
-      );
+      const fileRef = ref(storage, `products/${newFileName}`);
+      await uploadBytes(fileRef, buffer);
 
-      imageUrl = `/uploads/${newFileName}`;
+      const url = await getDownloadURL(fileRef);
+
+      imageId = newFileName;
+      imageUrl = url;
     } else {
-      imageUrl = previousImage;
+      imageId = previousImageId;
+      imageUrl = previousImageUrl;
     }
 
-    if (imageUrl !== previousImage) {
-      if (previousImage !== "/uploads/default.jpg") {
-        await fs.unlink(path.join(process.cwd(), "public", previousImage));
+    if (imageId !== previousImageId) {
+      if (previousImageId !== "default") {
+        const fileRef = ref(storage, `products/${previousImageId}`);
+        await deleteObject(fileRef);
       }
     } else {
-      imageUrl = previousImage;
+      imageUrl = previousImageUrl;
     }
 
     const product = await prismadb.product.update({
@@ -93,6 +105,7 @@ export async function PUT(
         id: params.productId as string,
       },
       data: {
+        imageId,
         imageUrl,
         name,
         description,
@@ -166,10 +179,9 @@ export async function DELETE(
       },
     });
 
-    if (product?.imageUrl && product?.imageUrl !== "/uploads/default.jpg") {
-      await fs.unlink(
-        path.join(process.cwd(), "public", product?.imageUrl as string)
-      );
+    if (product?.imageId && product?.imageId !== "default") {
+      const fileRef = ref(storage, `products/${product.imageId}`);
+      await deleteObject(fileRef);
     }
 
     await prismadb.product.delete({

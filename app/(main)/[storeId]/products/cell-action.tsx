@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
+import { Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -66,7 +66,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuItem
             onClick={() => {
               productModal.setIsEditing(true);
-              productModal.setProductData({ ...data, id: data.id, imageUrl: data.image });
+              productModal.setProductData({
+                ...data,
+                id: data.id,
+                imageUrl: data.image,
+                imageId: data.imageId,
+              });
               productModal.onOpen();
             }}
           >

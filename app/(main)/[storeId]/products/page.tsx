@@ -22,6 +22,7 @@ export default async function Product({
 
   const formattedProduct: ProductColumn[] = products.map((product) => ({
     id: product.id,
+    imageId: product.imageId ?? "",
     image: product.imageUrl ?? "",
     name: product.name,
     description: product.description ?? "-",

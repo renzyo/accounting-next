@@ -37,6 +37,7 @@ model Product {
   id             String   @id @default(uuid())
   storeId        String
   store          Store    @relation("StoreToProduct", fields: [storeId], references: [id])
+  imageId        String?
   imageUrl       String?
   name           String
   description    String?

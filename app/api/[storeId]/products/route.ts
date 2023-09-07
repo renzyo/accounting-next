@@ -1,7 +1,7 @@
-import fs from "fs/promises";
-import path from "path";
 import prismadb from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import firebaseApp, { storage } from "@/lib/firebase";
 
 export async function GET(
   req: NextRequest,
@@ -52,6 +52,7 @@ export async function POST(
       const stockThreshold = parseInt(body.get("stockThreshold") as string);
       const stock = parseInt(body.get("stock") as string);
       const image: File | null = body.get("image") as unknown as File;
+      let imageId = "default";
       let imageUrl = "/uploads/default.jpg";
 
       if (image) {
@@ -62,12 +63,13 @@ export async function POST(
         const fileExtension = fileName.split(".").pop();
         const newFileName = `${Date.now()}.${fileExtension}`;
 
-        await fs.writeFile(
-          path.join(process.cwd(), "public", "uploads", newFileName),
-          buffer
-        );
+        const fileRef = ref(storage, `products/${newFileName}`);
+        await uploadBytes(fileRef, buffer);
 
-        imageUrl = `/uploads/${newFileName}`;
+        // getDownloadURL
+        const url = await getDownloadURL(fileRef);
+        imageId = newFileName;
+        imageUrl = url;
       }
 
       if (!userId) {
@@ -103,6 +105,7 @@ export async function POST(
       const product = await prismadb.product.create({
         data: {
           storeId: params.storeId,
+          imageId,
           imageUrl,
           name,
           description,
@@ -148,6 +151,7 @@ export async function POST(
       const product = await prismadb.product.createMany({
         data: products.map((product: any) => ({
           storeId: params.storeId,
+          imageId: product.imageId,
           imageUrl: product.imageUrl,
           name: product.name,
           description: product.description,

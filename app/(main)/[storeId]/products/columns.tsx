@@ -8,6 +8,7 @@ import Image from "next/image";
 
 export type ProductColumn = {
   id: string;
+  imageId: string;
   image: string;
   name: string;
   description: string;
@@ -48,7 +49,7 @@ export const ProductColumns: ColumnDef<ProductColumn>[] = [
       return (
         <div className="flex items-center justify-center">
           <Image
-            src={"http://localhost:3000" + row.original.image ?? ""}
+            src={row.original.image ?? ""}
             width={200}
             height={200}
             alt="Product Image"

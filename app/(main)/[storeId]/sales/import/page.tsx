@@ -259,6 +259,7 @@ const ImportPage = () => {
 
       let newProductList: {
         name: string;
+        imageId: string;
         imageUrl: string;
         description: string;
         stockThreshold: number;
@@ -275,6 +276,7 @@ const ImportPage = () => {
             // if (sale.profit !== 0) {
             const newProduct = {
               name: sale.name,
+              imageId: "default",
               imageUrl: "/uploads/default.jpg",
               description: "",
               stockThreshold: 0,
