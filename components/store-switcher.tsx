@@ -8,7 +8,6 @@ import {
   Check,
   ChevronsUpDown,
   PlusCircle,
-  Settings2Icon,
   SettingsIcon,
   StoreIcon,
 } from "lucide-react";

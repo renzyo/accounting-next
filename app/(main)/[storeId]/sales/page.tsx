@@ -1,5 +1,5 @@
 import { DataTable } from "@/components/ui/data-table";
-import { BadgeDollarSign, PackageCheck } from "lucide-react";
+import { PackageCheck } from "lucide-react";
 import { SalesColumn, SalesColumns } from "./columns";
 import prismadb from "@/lib/prisma";
 import AddSale from "./add-sale-button";

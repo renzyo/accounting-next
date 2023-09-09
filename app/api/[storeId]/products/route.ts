@@ -1,7 +1,7 @@
 import prismadb from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import firebaseApp, { storage } from "@/lib/firebase";
+import { storage } from "@/lib/firebase";
 
 export async function GET(
   req: NextRequest,

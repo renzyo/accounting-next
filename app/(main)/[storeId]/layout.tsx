@@ -9,8 +9,6 @@ import SetMerchant from "./set-merchant";
 import { ModalProvider } from "@/providers/modal-provider";
 import SetStore from "./set-store";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
   title: appName,
   description: appDesc,

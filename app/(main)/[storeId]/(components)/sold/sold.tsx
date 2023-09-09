@@ -1,7 +1,6 @@
 "use client";
 
 import { Overview } from "@/components/overview";
-import { Heading } from "@/components/ui/heading";
 import { Subheading } from "@/components/ui/subheading";
 import axios from "axios";
 import { Loader2Icon, TruckIcon } from "lucide-react";

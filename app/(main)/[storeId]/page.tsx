@@ -1,17 +1,7 @@
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import prismadb from "@/lib/prisma";
-import {
-  AlertOctagon,
-  AlertOctagonIcon,
-  AlertTriangle,
-  AlertTriangleIcon,
-  CheckCircle,
-  CreditCard,
-  LayoutDashboard,
-  Package,
-} from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 import Stock from "./(components)/stock/stock";
 import Sold from "./(components)/sold/sold";
 import Rank from "./(components)/rank/rank";
