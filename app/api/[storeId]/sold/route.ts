@@ -1,5 +1,6 @@
+import { GlobalError, SuccessResponse } from "@/lib/helper";
 import prismadb from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 interface GraphData {
   name: string;
@@ -53,30 +54,10 @@ export async function GET(
       graphData[parseInt(month)].total = monthlyRevenue[parseInt(month)];
     }
 
-    return new NextResponse(
-      JSON.stringify({
-        status: "success",
-        data: graphData,
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return SuccessResponse({
+      data: graphData,
+    });
   } catch (error: any) {
-    return new NextResponse(
-      JSON.stringify({
-        status: "error",
-        message: error.message,
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return GlobalError(error);
   }
 }

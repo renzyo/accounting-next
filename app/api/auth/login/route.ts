@@ -1,4 +1,4 @@
-import { getErrorResponse } from "@/lib/helper";
+import { GlobalError, SuccessResponse } from "@/lib/helper";
 import prismadb from "@/lib/prisma";
 import { signJWT } from "@/lib/token";
 import { LoginUserInput, LoginUserSchema } from "@/lib/validations/user.schema";
@@ -18,7 +18,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user || !(await compare(data.password, user.password))) {
-      return getErrorResponse(401, "Invalid email or password");
+      return GlobalError({
+        message: "Invalid email or password.",
+        errorCode: 400,
+      });
     }
 
     const jwtExpiresIn = process.env.JWT_EXPIRES_IN!;
@@ -38,18 +41,11 @@ export async function POST(req: NextRequest) {
       maxAge: tokenMaxAge,
     };
 
-    const response = new NextResponse(
-      JSON.stringify({
-        status: "success",
-        token,
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = SuccessResponse({
+      status: "success",
+      message: "Successfully logged in.",
+      token,
+    });
 
     await Promise.all([
       response.cookies.set(cookieOptions),
@@ -67,10 +63,6 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error: any) {
-    if (error instanceof ZodError) {
-      return getErrorResponse(400, "Validation error", error);
-    }
-
-    return getErrorResponse(500, "Internal Server Error", error.message);
+    return GlobalError(error);
   }
 }

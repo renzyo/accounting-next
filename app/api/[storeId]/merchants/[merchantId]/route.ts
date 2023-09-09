@@ -1,5 +1,6 @@
+import { GlobalError, SuccessResponse } from "@/lib/helper";
 import prismadb from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export async function PUT(
   req: NextRequest,
@@ -18,25 +19,9 @@ export async function PUT(
       },
     });
 
-    return new NextResponse(JSON.stringify(merchant), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (error) {
-    return new NextResponse(
-      JSON.stringify({
-        status: "error",
-        message: "Something went wrong.",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return SuccessResponse(merchant);
+  } catch (error: any) {
+    return GlobalError(error);
   }
 }
 
@@ -51,24 +36,8 @@ export async function DELETE(
       },
     });
 
-    return new NextResponse(JSON.stringify(merchant), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (error) {
-    return new NextResponse(
-      JSON.stringify({
-        status: "error",
-        message: "Something went wrong.",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return SuccessResponse(merchant);
+  } catch (error: any) {
+    return GlobalError(error);
   }
 }

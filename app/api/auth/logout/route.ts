@@ -1,12 +1,7 @@
-import { NextResponse } from "next/server";
+import { SuccessResponse } from "@/lib/helper";
 
 export async function GET() {
-  const response = new NextResponse(JSON.stringify({ status: "success" }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const response = SuccessResponse({ message: "Logout successful." });
 
   await Promise.all([
     response.cookies.set({

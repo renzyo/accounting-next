@@ -1,5 +1,6 @@
+import { GlobalError, SuccessResponse } from "@/lib/helper";
 import prismadb from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export async function GET(
   req: NextRequest,
@@ -12,26 +13,10 @@ export async function GET(
       },
     });
 
-    return new NextResponse(JSON.stringify(sales), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (error) {
+    return SuccessResponse(sales);
+  } catch (error: any) {
     console.error(error);
-    return new NextResponse(
-      JSON.stringify({
-        status: "error",
-        message: "Something went wrong.",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return GlobalError(error);
   }
 }
 
@@ -54,18 +39,10 @@ export async function POST(
 
       if (product?.stock! !== 0) {
         if (product?.stock! < quantity) {
-          return new NextResponse(
-            JSON.stringify({
-              status: "error",
-              message: "You do not have enough stock.",
-            }),
-            {
-              status: 400,
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          return GlobalError({
+            message: "The quantity is greater than the stock.",
+            errorCode: 400,
+          });
         }
 
         await prismadb.product.update({
@@ -88,18 +65,7 @@ export async function POST(
         },
       });
 
-      return new NextResponse(
-        JSON.stringify({
-          status: "success",
-          data: sales,
-        }),
-        {
-          status: 201,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      return SuccessResponse(sales);
     } else if (type === "bulk") {
       const { sales } = body;
 
@@ -117,32 +83,10 @@ export async function POST(
         })
       );
 
-      return new NextResponse(
-        JSON.stringify({
-          status: "success",
-          data: salesData,
-        }),
-        {
-          status: 201,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      return SuccessResponse(salesData);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return new NextResponse(
-      JSON.stringify({
-        status: "error",
-        message: "Something went wrong.",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return GlobalError(error);
   }
 }

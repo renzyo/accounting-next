@@ -1,5 +1,5 @@
 import prismadb from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import {
   deleteObject,
   getDownloadURL,
@@ -7,6 +7,7 @@ import {
   uploadBytes,
 } from "firebase/storage";
 import { storage } from "@/lib/firebase";
+import { GlobalError, SuccessResponse } from "@/lib/helper";
 
 export async function PUT(
   req: NextRequest,
@@ -68,18 +69,13 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json({ success: true, product });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        status: "error",
-        message: "Something went wrong.",
-      },
-      {
-        status: 500,
-      }
-    );
+    return SuccessResponse({
+      status: "success",
+      message: "Product updated successfully.",
+      data: product,
+    });
+  } catch (error: any) {
+    return GlobalError(error);
   }
 }
 
@@ -105,31 +101,12 @@ export async function DELETE(
       await deleteObject(fileRef);
     }
 
-    return new NextResponse(
-      JSON.stringify({
-        status: "success",
-        message: "Store deleted successfully.",
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  } catch (error) {
+    return SuccessResponse({
+      status: "success",
+      message: "Product deleted successfully.",
+    });
+  } catch (error: any) {
     console.error(error);
-    return new NextResponse(
-      JSON.stringify({
-        status: "error",
-        message: "Something went wrong.",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return GlobalError(error);
   }
 }

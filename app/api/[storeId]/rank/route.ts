@@ -1,5 +1,6 @@
+import { GlobalError, SuccessResponse } from "@/lib/helper";
 import prismadb from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 interface RankingData {
   productId: string;
@@ -60,32 +61,13 @@ export async function GET(
       topFive = sortedRanking;
     }
 
-    return new NextResponse(
-      JSON.stringify({
-        status: "success",
-        topFive,
-        bottomFive,
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  } catch (error) {
+    return SuccessResponse({
+      status: "success",
+      topFive,
+      bottomFive,
+    });
+  } catch (error: any) {
     console.error(error);
-    return new NextResponse(
-      JSON.stringify({
-        status: "error",
-        message: "Something went wrong. Please try again later.",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return GlobalError(error);
   }
 }

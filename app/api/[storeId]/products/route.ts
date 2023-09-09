@@ -1,7 +1,8 @@
 import prismadb from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "@/lib/firebase";
+import { GlobalError, SuccessResponse } from "@/lib/helper";
 
 export async function GET(
   req: NextRequest,
@@ -14,26 +15,10 @@ export async function GET(
       },
     });
 
-    return new NextResponse(JSON.stringify(products), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (error) {
+    return SuccessResponse(products);
+  } catch (error: any) {
     console.error(error);
-    return new NextResponse(
-      JSON.stringify({
-        status: "error",
-        message: "Something went wrong.",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return GlobalError(error);
   }
 }
 
@@ -83,23 +68,15 @@ export async function POST(
         },
       });
 
-      return NextResponse.json({ success: true, product });
+      return SuccessResponse(product);
     } else if (type === "bulk") {
       const products = JSON.parse(body.get("products") as string);
 
       if (!products) {
-        return NextResponse.json(
-          {
-            status: "error",
-            message: "Please provide a name for your store.",
-          },
-          {
-            status: 400,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        return GlobalError({
+          message: "Products is required.",
+          errorCode: 400,
+        });
       }
 
       const product = await prismadb.product.createMany({
@@ -114,13 +91,10 @@ export async function POST(
         })),
       });
 
-      return NextResponse.json({ success: true, products: product });
+      return SuccessResponse(product);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Something went wrong." },
-      { status: 500 }
-    );
+    return GlobalError(error);
   }
 }
