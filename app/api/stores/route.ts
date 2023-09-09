@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     return new NextResponse(
       JSON.stringify({
         status: "success",
-        data: store,
+        id: store.id,
       }),
       {
         status: 201,
