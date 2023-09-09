@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import prismadb from "@/lib/prisma";
 import { cookies } from "next/headers";
+import { StoreModal } from "@/components/modals/store-modal";
 
 export default async function SetupLayout({
   children,
@@ -20,5 +21,10 @@ export default async function SetupLayout({
     redirect(`/${store.id}`);
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <StoreModal />
+      {children}
+    </>
+  );
 }

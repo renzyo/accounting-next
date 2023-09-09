@@ -2,10 +2,16 @@
 
 import React, { FC } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { useStoreModal } from "@/hooks/use-store-modal";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "./ui/button";
-import { Check, ChevronsUpDown, PlusCircle, Store } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  PlusCircle,
+  Settings2Icon,
+  SettingsIcon,
+  StoreIcon,
+} from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -16,17 +22,21 @@ import {
   CommandSeparator,
 } from "./ui/command";
 import { cn } from "@/lib/utils";
+import { Store } from "@prisma/client";
+import { useAddStoreModal } from "@/hooks/use-add-store-modal";
+import { useStoreList } from "@/hooks/use-store-list-modal";
 
 type PopoverTriggerProps = React.ComponentPropsWithoutRef<
   typeof PopoverTrigger
 >;
 
 interface StoreSwitcherProps extends PopoverTriggerProps {
-  items: Record<string, any>[];
+  items: Store[];
 }
 
 const StoreSwitcher: FC<StoreSwitcherProps> = ({ className, items }) => {
-  const storeModal = useStoreModal();
+  const storeModal = useAddStoreModal();
+  const storeList = useStoreList();
   const params = useParams();
   const router = useRouter();
 
@@ -57,7 +67,7 @@ const StoreSwitcher: FC<StoreSwitcherProps> = ({ className, items }) => {
           aria-label="Select a store"
           className={cn("min-w-[200px] justify-between", className)}
         >
-          <Store className="mr-2 h-4 w-4" />
+          <StoreIcon className="mr-2 h-4 w-4" />
           {currentStore?.label}
           <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -65,16 +75,16 @@ const StoreSwitcher: FC<StoreSwitcherProps> = ({ className, items }) => {
       <PopoverContent className="min-w-[200px] p-0">
         <Command>
           <CommandList>
-            <CommandInput placeholder="Search store..." />
-            <CommandEmpty>No store found.</CommandEmpty>
-            <CommandGroup heading="Stores">
+            <CommandInput placeholder="Cari toko..." />
+            <CommandEmpty>Toko tidak ditemukan.</CommandEmpty>
+            <CommandGroup heading="Pilih Toko">
               {formattedItems.map((store) => (
                 <CommandItem
                   key={store.value}
                   onSelect={() => onStoreSelect(store)}
                   className="text-sm"
                 >
-                  <Store className="mr-2 h-4 w-4" />
+                  <StoreIcon className="mr-2 h-4 w-4" />
                   {store.label}
                   <Check
                     className={cn(
@@ -94,11 +104,20 @@ const StoreSwitcher: FC<StoreSwitcherProps> = ({ className, items }) => {
               <CommandItem
                 onSelect={() => {
                   setOpen(false);
+                  storeList.onOpen();
+                }}
+              >
+                <SettingsIcon className="mr-2 h-5 w-5" />
+                Kelola Toko
+              </CommandItem>
+              <CommandItem
+                onSelect={() => {
+                  setOpen(false);
                   storeModal.onOpen();
                 }}
               >
                 <PlusCircle className="mr-2 h-5 w-5" />
-                Create Store
+                Tambah Toko
               </CommandItem>
             </CommandGroup>
           </CommandList>

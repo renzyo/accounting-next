@@ -7,6 +7,7 @@ import { appDesc, appName } from "@/lib/static";
 import SetProduct from "./set-product";
 import SetMerchant from "./set-merchant";
 import { ModalProvider } from "@/providers/modal-provider";
+import SetStore from "./set-store";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,8 @@ const RootLayout = async ({
   children: React.ReactNode;
   params: { storeId: string };
 }) => {
+  const stores = await prismadb.store.findMany();
+
   const products = await prismadb.product.findMany({
     where: {
       storeId: params.storeId,
@@ -34,6 +37,7 @@ const RootLayout = async ({
     <>
       <ModalProvider />
       <Navbar />
+      <SetStore stores={stores} />
       <SetProduct products={products} />
       <SetMerchant merchants={merchants} />
       {children}

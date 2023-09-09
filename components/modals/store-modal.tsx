@@ -5,7 +5,7 @@ import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
@@ -17,15 +17,20 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useStoreModal } from "@/hooks/use-store-modal";
 import { Button } from "@/components/ui/button";
+import { useAddStoreModal } from "@/hooks/use-add-store-modal";
+import { useStoreList } from "@/hooks/use-store-list-modal";
+import { Store } from "@prisma/client";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z.string().min(1),
 });
 
 export const StoreModal = () => {
-  const storeModal = useStoreModal();
+  const router = useRouter();
+  const storeList = useStoreList();
+  const storeModalStore = useAddStoreModal();
 
   const [loading, setLoading] = useState(false);
 
@@ -36,13 +41,49 @@ export const StoreModal = () => {
     },
   });
 
+  useEffect(() => {
+    if (storeModalStore.isEditing) {
+      form.setValue("name", storeModalStore.storeData?.name ?? "");
+    }
+  }, [storeModalStore.isEditing, storeModalStore.storeData, form]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/stores", values);
 
-      toast.success("Store created successfully");
-      window.location.assign(`/${response.data.id}`);
+      if (storeModalStore.isEditing) {
+        await axios.put(`/api/stores/${storeModalStore.storeData?.id}`, values);
+        toast.success("Store updated successfully");
+
+        const oldStoreList = storeList.storeList ?? [];
+        const updatedStore = oldStoreList.find(
+          (store) => store.id === storeModalStore.storeData?.id
+        )!;
+        updatedStore.name = values.name;
+        oldStoreList.splice(
+          oldStoreList.indexOf(updatedStore),
+          1,
+          updatedStore
+        );
+
+        storeList.setStoreList(oldStoreList);
+        form.reset();
+        storeModalStore.setIsEditing(false);
+        storeModalStore.onClose();
+        router.refresh();
+      } else {
+        const response = await axios.post("/api/stores", values);
+
+        const oldStoreList = storeList.storeList ?? [];
+
+        storeList.setStoreList(oldStoreList.concat(response.data as Store));
+
+        toast.success("Store created successfully");
+        form.reset();
+        storeModalStore.setIsEditing(false);
+        storeModalStore.onClose();
+        window.location.assign(`/${response.data.id}`);
+      }
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
@@ -54,8 +95,8 @@ export const StoreModal = () => {
     <Modal
       title="Buat toko baru"
       description="Buat toko baru untuk manajemen penjualan barang"
-      isOpen={storeModal.isOpen}
-      onClose={storeModal.onClose}
+      isOpen={storeModalStore.isOpen}
+      onClose={storeModalStore.onClose}
     >
       <div>
         <div className="space-y-4 py-2 pb-4">
@@ -83,7 +124,7 @@ export const StoreModal = () => {
                   <Button
                     disabled={loading}
                     variant="outline"
-                    onClick={storeModal.onClose}
+                    onClick={storeModalStore.onClose}
                   >
                     Cancel
                   </Button>
