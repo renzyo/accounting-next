@@ -42,7 +42,6 @@ export async function POST(
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const userId = req.cookies.get("userId")?.value;
     const body = await req.formData();
     const type = body.get("type") as string;
 
@@ -72,36 +71,6 @@ export async function POST(
         imageUrl = url;
       }
 
-      if (!userId) {
-        return NextResponse.json(
-          {
-            status: "error",
-            message: "You are not authorized to access this route.",
-          },
-          {
-            status: 401,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      }
-
-      if (!name) {
-        return new NextResponse(
-          JSON.stringify({
-            status: "error",
-            message: "Please provide a name for your store.",
-          }),
-          {
-            status: 400,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      }
-
       const product = await prismadb.product.create({
         data: {
           storeId: params.storeId,
@@ -117,21 +86,6 @@ export async function POST(
       return NextResponse.json({ success: true, product });
     } else if (type === "bulk") {
       const products = JSON.parse(body.get("products") as string);
-
-      if (!userId) {
-        return NextResponse.json(
-          {
-            status: "error",
-            message: "You are not authorized to access this route.",
-          },
-          {
-            status: 401,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      }
 
       if (!products) {
         return NextResponse.json(

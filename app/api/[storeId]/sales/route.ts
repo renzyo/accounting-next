@@ -40,27 +40,11 @@ export async function POST(
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const userId = req.cookies.get("userId")?.value;
     const body = await req.json();
     const { type } = body;
 
     if (type === "single") {
       const { merchantId, productId, quantity, saleDate } = body;
-
-      if (!userId) {
-        return new NextResponse(
-          JSON.stringify({
-            status: "error",
-            message: "You are not authorized to access this route.",
-          }),
-          {
-            status: 401,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      }
 
       const product = await prismadb.product.findUnique({
         where: {
@@ -118,21 +102,6 @@ export async function POST(
       );
     } else if (type === "bulk") {
       const { sales } = body;
-
-      if (!userId) {
-        return new NextResponse(
-          JSON.stringify({
-            status: "error",
-            message: "You are not authorized to access this route.",
-          }),
-          {
-            status: 401,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      }
 
       const salesData = await Promise.all(
         sales.map((sale: any) => {

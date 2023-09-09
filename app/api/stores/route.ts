@@ -7,21 +7,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name } = body;
 
-    if (!userId) {
-      return new NextResponse(
-        JSON.stringify({
-          status: "error",
-          message: "You are not authorized to access this route.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
-
     if (!name) {
       return new NextResponse(
         JSON.stringify({

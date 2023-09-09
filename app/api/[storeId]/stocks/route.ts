@@ -6,45 +6,7 @@ export async function GET(
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const userId = req.cookies.get("userId")?.value;
     const storeId = params.storeId as string;
-
-    if (!userId) {
-      return new NextResponse(
-        JSON.stringify({
-          status: "error",
-          message: "You are not authorized to access this route.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
-
-    const stores = await prismadb.store.findMany({
-      where: {
-        userId: userId as string,
-        id: storeId,
-      },
-    });
-
-    if (!stores) {
-      return new NextResponse(
-        JSON.stringify({
-          status: "error",
-          message: "You are not authorized to access this route.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
 
     const products = await prismadb.product.findMany({
       where: {

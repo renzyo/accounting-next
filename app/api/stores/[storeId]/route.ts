@@ -6,45 +6,7 @@ export async function PUT(
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const userId = req.cookies.get("userId")?.value;
     const storeId = params.storeId as string;
-
-    if (!userId) {
-      return new NextResponse(
-        JSON.stringify({
-          status: "error",
-          message: "You are not authorized to access this route.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
-
-    const stores = await prismadb.store.findMany({
-      where: {
-        userId: userId as string,
-        id: storeId,
-      },
-    });
-
-    if (!stores) {
-      return new NextResponse(
-        JSON.stringify({
-          status: "error",
-          message: "You are not authorized to access this route.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
 
     const body = await req.json();
     const { name } = body;
@@ -86,45 +48,7 @@ export async function DELETE(
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const userId = req.cookies.get("userId")?.value;
     const storeId = params.storeId as string;
-
-    if (!userId) {
-      return new NextResponse(
-        JSON.stringify({
-          status: "error",
-          message: "You are not authorized to access this route.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
-
-    const stores = await prismadb.store.findMany({
-      where: {
-        userId: userId as string,
-        id: storeId,
-      },
-    });
-
-    if (!stores) {
-      return new NextResponse(
-        JSON.stringify({
-          status: "error",
-          message: "You are not authorized to access this route.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
 
     await prismadb.store.delete({
       where: {

@@ -6,47 +6,9 @@ export async function PUT(
   { params }: { params: { storeId: string; salesId: string } }
 ) {
   try {
-    const userId = req.cookies.get("userId")?.value;
     const body = await req.json();
     const { merchantId, productId, saleDate, quantity, previousQuantity } =
       body;
-
-    if (!userId) {
-      return new NextResponse(
-        JSON.stringify({
-          status: "error",
-          message: "You are not authorized to access this route.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
-
-    const store = await prismadb.store.findUnique({
-      where: {
-        id: params.storeId as string,
-        userId: userId as string,
-      },
-    });
-
-    if (!store) {
-      return new NextResponse(
-        JSON.stringify({
-          status: "error",
-          message: "You are not authorized to access this route.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
 
     const oldProduct = await prismadb.product.findUnique({
       where: {
@@ -123,46 +85,8 @@ export async function DELETE(
   { params }: { params: { storeId: string; salesId: string } }
 ) {
   try {
-    const userId = req.cookies.get("userId")?.value;
     const body = await req.json();
     const { productId, quantity } = body;
-
-    if (!userId) {
-      return new NextResponse(
-        JSON.stringify({
-          status: "error",
-          message: "You are not authorized to access this route.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
-
-    const store = await prismadb.store.findUnique({
-      where: {
-        id: params.storeId as string,
-        userId: userId as string,
-      },
-    });
-
-    if (!store) {
-      return new NextResponse(
-        JSON.stringify({
-          status: "error",
-          message: "You are not authorized to access this route.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
 
     const product = await prismadb.product.findUnique({
       where: {
