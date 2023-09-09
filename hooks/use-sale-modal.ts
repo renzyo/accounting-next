@@ -7,6 +7,7 @@ interface useSaleModalStore {
     id: string;
     merchantId: string;
     productId: string;
+    saleDate: Date;
     quantity: string;
   };
   onOpen: () => void;
@@ -16,6 +17,7 @@ interface useSaleModalStore {
     id: string;
     merchantId: string;
     productId: string;
+    saleDate: Date;
     quantity: string;
   }) => void;
 }

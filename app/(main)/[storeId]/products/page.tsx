@@ -1,9 +1,10 @@
 import { DataTable } from "@/components/ui/data-table";
 import { Package } from "lucide-react";
-import { ProductColumn, ProductColumns } from "./columns";
 import prismadb from "@/lib/prisma";
 import AddProduct from "./add-product-button";
 import SetProduct from "../set-product";
+import { Heading } from "@/components/ui/heading";
+import { ProductColumn, ProductColumns } from "./columns";
 
 export default async function Product({
   params,
@@ -33,10 +34,11 @@ export default async function Product({
   return (
     <section className="mx-auto my-8 w-4/5 p-8 bg-slate-50 shadow-lg rounded-lg">
       <header className="flex flex-col md:flex-row items-center">
-        <div className="flex gap-2 items-center">
-          <Package className="w-8 h-8" />
-          <h2 className="font-semibold text-xl">Produk Toko</h2>
-        </div>
+        <Heading
+          icon={<Package className="w-8 h-8" />}
+          title="Produk Toko"
+          description="Produk yang terdapat pada toko anda"
+        />
         <div className="flex ml-auto">
           <SetProduct products={products} />
           <AddProduct products={products} />

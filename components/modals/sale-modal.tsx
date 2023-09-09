@@ -3,6 +3,7 @@
 import * as z from "zod";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useEffect, useState } from "react";
@@ -30,11 +31,22 @@ import {
 } from "../ui/select";
 import { useMerchantList } from "@/hooks/use-merchant-list-modal";
 import { ScrollArea } from "../ui/scroll-area";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "../ui/calendar";
 
 const formSchema = z.object({
   id: z.string().min(1),
   merchantId: z.string().min(1),
   productId: z.string().min(1),
+  saleDate: z.date({
+    required_error: "Tanggal penjualan harus diisi.",
+  }),
   quantity: z.string().min(1),
 });
 
@@ -54,6 +66,7 @@ export const SaleModal = () => {
       : {
           merchantId: "",
           productId: "",
+          saleDate: new Date(),
           quantity: "",
         },
   });
@@ -63,6 +76,10 @@ export const SaleModal = () => {
       form.setValue("merchantId", saleModalStore.saleData?.merchantId ?? "");
       form.setValue("productId", saleModalStore.saleData?.productId ?? "");
       form.setValue("quantity", saleModalStore.saleData?.quantity ?? "");
+      form.setValue(
+        "saleDate",
+        saleModalStore.saleData?.saleDate ?? new Date()
+      );
     }
   }, [saleModalStore.isEditing, saleModalStore.saleData, form]);
 
@@ -72,6 +89,7 @@ export const SaleModal = () => {
       const sale = {
         merchantId: values.merchantId,
         productId: values.productId,
+        saleDate: values.saleDate,
         quantity: parseInt(values.quantity),
       };
 
@@ -200,6 +218,52 @@ export const SaleModal = () => {
                           </ScrollArea>
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="saleDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tanggal Penjualan</FormLabel>
+                      <FormControl>
+                        <div className="block">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {field.value ? (
+                                  format(new Date(field.value), "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <Calendar
+                                mode="single"
+                                selected={
+                                  field.value
+                                    ? new Date(field.value)
+                                    : new Date()
+                                }
+                                onSelect={(date) => {
+                                  if (date) field.onChange(date);
+                                }}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

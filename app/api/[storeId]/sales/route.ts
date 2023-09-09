@@ -45,7 +45,7 @@ export async function POST(
     const { type } = body;
 
     if (type === "single") {
-      const { merchantId, productId, quantity } = body;
+      const { merchantId, productId, quantity, saleDate } = body;
 
       if (!userId) {
         return new NextResponse(
@@ -99,6 +99,7 @@ export async function POST(
           storeId: params.storeId,
           merchantId,
           productId: productId,
+          saleDate: saleDate,
           quantity,
         },
       });
@@ -140,6 +141,7 @@ export async function POST(
               storeId: params.storeId,
               merchantId: sale.merchantId,
               productId: sale.productId,
+              saleDate: new Date(),
               quantity: sale.quantity,
             },
           });

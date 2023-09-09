@@ -73,6 +73,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 id: data.id,
                 merchantId: data.merchant.id,
                 productId: data.product.id,
+                saleDate: data.saleDate,
                 quantity: data.quantity.toString(),
               });
               saleModalStore.onOpen();

@@ -16,8 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { ProductColumn } from "./columns";
 import { useProductModal } from "@/hooks/use-product-modal";
+import { ProductColumn } from "./columns";
 
 interface CellActionProps {
   data: ProductColumn;

@@ -62,6 +62,7 @@ model Sales {
   store      Store    @relation("StoreToSales", fields: [storeId], references: [id])
   productId  String
   product    Product  @relation("ProductToSales", fields: [productId], references: [id])
+  saleDate   DateTime @default(now())
   quantity   Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
