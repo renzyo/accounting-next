@@ -1,7 +1,5 @@
 import { Inter } from "next/font/google";
 
-import { ModalProvider } from "@/providers/modal-provider";
-
 import "./globals.css";
 import { ToasterProvider } from "@/providers/toaster-provider";
 import { appDesc, appName } from "@/lib/static";

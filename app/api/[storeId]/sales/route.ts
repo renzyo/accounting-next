@@ -25,6 +25,7 @@ export async function POST(
   { params }: { params: { storeId: string } }
 ) {
   try {
+    const userId = req.headers.get("x-user-id")!;
     const body = await req.json();
     const { type } = body;
 
@@ -59,6 +60,7 @@ export async function POST(
         data: {
           storeId: params.storeId,
           merchantId,
+          userId,
           productId: productId,
           saleDate: saleDate,
           quantity,
@@ -74,6 +76,7 @@ export async function POST(
           return prismadb.sales.create({
             data: {
               storeId: params.storeId,
+              userId,
               merchantId: sale.merchantId,
               productId: sale.productId,
               saleDate: new Date(),

@@ -14,24 +14,33 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await hash(data.password, 12);
 
-    const user = await prismadb.user.create({
-      data: {
-        name: data.name,
-        email: data.email,
-        password: hashedPassword,
-      },
-    });
+    const users = await prismadb.user.findMany();
 
-    return SuccessResponse({
-      status: "success",
-      message: "Successfully registered.",
-      data: {
-        user: {
-          ...user,
-          password: undefined,
+    if (users.length === 0) {
+      const user = await prismadb.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          password: hashedPassword,
         },
-      },
-    });
+      });
+
+      return SuccessResponse({
+        status: "success",
+        message: "Successfully registered.",
+        data: {
+          user: {
+            ...user,
+            password: undefined,
+          },
+        },
+      });
+    } else {
+      return GlobalError({
+        message: "You are not allowed to register.",
+        errorCode: 400,
+      });
+    }
   } catch (error: any) {
     return GlobalError(error);
   }

@@ -1,18 +1,10 @@
 import prismadb from "@/lib/prisma";
-import { cookies } from "next/headers";
 import { MainNav } from "./main-nav";
 import StoreSwitcher from "./store-switcher";
 import UserButton from "./user-button";
 
 export const Navbar = async () => {
-  const cookieStore = cookies();
-  const userId = cookieStore.get("userId")?.value;
-
-  const stores = await prismadb.store.findMany({
-    where: {
-      userId,
-    },
-  });
+  const stores = await prismadb.store.findMany();
 
   return (
     <div className="border-b">

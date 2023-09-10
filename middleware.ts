@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getErrorResponse } from "./lib/helper";
 import { verifyJWT } from "./lib/token";
+import { GlobalError, UnauthorizedError } from "./lib/helper";
 
 interface AuthenticatedRequest extends NextRequest {
   user: {
@@ -26,10 +26,7 @@ export async function middleware(req: NextRequest) {
     (req.nextUrl.pathname.startsWith("/api/users") ||
       req.nextUrl.pathname.startsWith("/api/auth/logout"))
   ) {
-    return getErrorResponse(
-      401,
-      "You are not authorized to access this route."
-    );
+    return UnauthorizedError({ message: "You are not authorized." });
   }
 
   const response = NextResponse.next();
@@ -43,11 +40,7 @@ export async function middleware(req: NextRequest) {
   } catch (error: any) {
     redirectToLogin = true;
     if (req.nextUrl.pathname.startsWith("/api")) {
-      return getErrorResponse(
-        401,
-        "Token is invalid or user doesn't exists.",
-        error
-      );
+      return GlobalError({ message: error.message });
     }
 
     return NextResponse.redirect(

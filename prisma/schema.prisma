@@ -11,20 +11,19 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String?
-  password  String
-  stores    Store[]   @relation("StoreToUser")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id               String   @id @default(uuid())
+  email            String   @unique
+  name             String?
+  password         String
+  role             String   @default("VIEWER")
+  isFirstTimeLogin Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  sales            Sales[]
 }
 
 model Store {
   id          String    @id @default(uuid())
-  userId      String
-  user        User      @relation("StoreToUser", fields: [userId], references: [id])
   name        String
   description String?
   products    Product[] @relation("StoreToProduct")
@@ -49,9 +48,11 @@ model Product {
 }
 
 model Merchant {
-  id    String  @id @default(uuid())
-  name  String
-  Sales Sales[]
+  id        String   @id @default(uuid())
+  name      String
+  Sales     Sales[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Sales {
@@ -60,6 +61,8 @@ model Sales {
   merchant   Merchant @relation(fields: [merchantId], references: [id])
   storeId    String
   store      Store    @relation("StoreToSales", fields: [storeId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
   productId  String
   product    Product  @relation("ProductToSales", fields: [productId], references: [id])
   saleDate   DateTime @default(now())

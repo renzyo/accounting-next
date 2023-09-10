@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
     const store = await prismadb.store.create({
       data: {
         name,
-        userId: userId as string,
       },
     });
 

@@ -3,8 +3,7 @@ import { PackageCheck } from "lucide-react";
 import { SalesColumn, SalesColumns } from "./columns";
 import prismadb from "@/lib/prisma";
 import AddSale from "./add-sale-button";
-import ImportSale from "./import-sale";
-import SetProduct from "../set-product";
+import SetProduct from "@/app/(main)/[storeId]/set-product";
 import { Heading } from "@/components/ui/heading";
 
 export default async function Sales({
@@ -51,7 +50,6 @@ export default async function Sales({
         <div className="flex ml-auto gap-4">
           <SetProduct products={products} />
           <AddSale />
-          <ImportSale />
         </div>
       </header>
       <div className="mt-8">

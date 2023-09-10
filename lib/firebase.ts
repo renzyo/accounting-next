@@ -16,7 +16,7 @@ let firebaseApp = getApps().length
 
 export const storage = getStorage(
   firebaseApp,
-  "gs://accounting-6c59c.appspot.com"
+  `gs://${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}`
 );
 
 export default firebaseApp;

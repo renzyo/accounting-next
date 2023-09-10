@@ -1,5 +1,6 @@
 "use client";
 
+import "../../globals.css";
 import { appDesc, appName } from "@/lib/static";
 import Image from "next/image";
 import { useForm } from "react-hook-form";

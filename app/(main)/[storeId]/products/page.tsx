@@ -2,7 +2,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { Package } from "lucide-react";
 import prismadb from "@/lib/prisma";
 import AddProduct from "./add-product-button";
-import SetProduct from "../set-product";
+import SetProduct from "@/app/(main)/[storeId]/set-product";
 import { Heading } from "@/components/ui/heading";
 import { ProductColumn, ProductColumns } from "./columns";
 

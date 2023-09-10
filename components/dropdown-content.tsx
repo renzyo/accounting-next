@@ -8,12 +8,16 @@ import {
   DropdownMenuSeparator,
 } from "./ui/dropdown-menu";
 import axios from "axios";
+import { useParams, useRouter } from "next/navigation";
 
 interface DropdownContentProps {
   name: string;
 }
 
 export default function DropdownContent({ name }: DropdownContentProps) {
+  const params = useParams();
+  const router = useRouter();
+
   async function handleLogout() {
     try {
       toast.success("Logged out");
@@ -31,6 +35,20 @@ export default function DropdownContent({ name }: DropdownContentProps) {
     <DropdownMenuContent align="end">
       <DropdownMenuLabel>{name}</DropdownMenuLabel>
       <DropdownMenuSeparator />
+      <DropdownMenuItem
+        onClick={() => {
+          router.push(`/${params.storeId}/profile`);
+        }}
+      >
+        Profil Saya
+      </DropdownMenuItem>
+      <DropdownMenuItem
+        onClick={() => {
+          router.push(`/${params.storeId}/manage-user`);
+        }}
+      >
+        Kelola User
+      </DropdownMenuItem>
       <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
     </DropdownMenuContent>
   );

@@ -1,6 +1,6 @@
+import "../globals.css";
 import { redirect } from "next/navigation";
 import prismadb from "@/lib/prisma";
-import { cookies } from "next/headers";
 import { StoreModal } from "@/components/modals/store-modal";
 
 export default async function SetupLayout({
@@ -8,14 +8,7 @@ export default async function SetupLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies();
-  const userId = cookieStore.get("userId")?.value;
-
-  const store = await prismadb.store.findFirst({
-    where: {
-      userId,
-    },
-  });
+  const store = await prismadb.store.findFirst();
 
   if (store) {
     redirect(`/${store.id}`);

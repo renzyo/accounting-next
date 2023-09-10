@@ -8,6 +8,7 @@ import { SaleModal } from "@/components/modals/sale-modal";
 import { MerchantListModal } from "@/components/modals/merchant-list-modal";
 import { AddMerchantModal } from "@/components/modals/add-merchant-modal";
 import { StoreListModal } from "@/components/modals/store-list-modal";
+import { UserModal } from "@/components/modals/user-modal";
 
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -25,6 +26,7 @@ export const ModalProvider = () => {
       <AddMerchantModal />
       <MerchantListModal />
       <StoreListModal />
+      <UserModal />
       <StoreModal />
       <ProductModal />
       <SaleModal />
