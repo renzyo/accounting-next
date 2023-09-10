@@ -7,6 +7,7 @@ import { StockColumn, StockColumns } from "./columns";
 import { StockDataTable } from "./data-table";
 import { Loader2Icon, PackageXIcon } from "lucide-react";
 import { Subheading } from "@/components/ui/subheading";
+import LoadingIndicator from "@/components/loading-indicator";
 
 const Stock = () => {
   const params = useParams();
@@ -33,11 +34,7 @@ const Stock = () => {
   }, [params.storeId]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center p-16">
-        <Loader2Icon className="w-8 h-8 animate-spin" />
-      </div>
-    );
+    return <LoadingIndicator />;
   }
 
   return (

@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingIndicator from "@/components/loading-indicator";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,9 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { User2Icon } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { Loader2Icon, User2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import * as z from "zod";
 
 const profileFormSchema = z.object({
@@ -30,6 +33,9 @@ const passwordFormSchema = z.object({
 });
 
 const Profile = () => {
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<z.infer<typeof profileFormSchema>>({
     name: "",
     email: "",
@@ -60,6 +66,8 @@ const Profile = () => {
         name: response.data.user?.name,
         email: response.data.user?.email,
       });
+
+      setLoading(false);
     };
 
     getProfile();
@@ -69,6 +77,59 @@ const Profile = () => {
     profileForm.setValue("name", profile.name);
     profileForm.setValue("email", profile.email);
   }, [profile, profileForm]);
+
+  async function handleProfileUpdate(
+    values: z.infer<typeof profileFormSchema>
+  ) {
+    try {
+      const response = await axios.put("/api/auth/profile", {
+        name: values.name,
+        email: values.email,
+      });
+
+      setProfile({
+        name: response.data.user?.name,
+        email: response.data.user?.email,
+      });
+
+      profileForm.setValue("name", response.data.user?.name);
+      profileForm.setValue("email", response.data.user?.email);
+
+      router.refresh();
+      toast.success("Profile updated");
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+
+  async function handleChangePassword(
+    values: z.infer<typeof passwordFormSchema>
+  ) {
+    try {
+      if (values.password !== values.confirmPassword) {
+        toast.error("Password tidak sama");
+        return;
+      }
+
+      await axios.put("/api/auth/profile/change-password", {
+        oldPassword: values.oldPassword,
+        password: values.password,
+      });
+
+      passwordForm.setValue("oldPassword", "");
+      passwordForm.setValue("password", "");
+      passwordForm.setValue("confirmPassword", "");
+
+      router.refresh();
+      toast.success("password updated");
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  }
+
+  if (loading) return <LoadingIndicator />;
 
   return (
     <div className="mx-auto my-8 w-4/5 p-8 bg-slate-50 shadow-lg rounded-lg">
@@ -84,7 +145,7 @@ const Profile = () => {
             <Form {...profileForm}>
               <form
                 className="space-y-4"
-                onSubmit={profileForm.handleSubmit(() => {})}
+                onSubmit={profileForm.handleSubmit(handleProfileUpdate)}
               >
                 <FormField
                   control={profileForm.control}
@@ -121,7 +182,7 @@ const Profile = () => {
             <Form {...passwordForm}>
               <form
                 className="space-y-4"
-                onSubmit={passwordForm.handleSubmit(() => {})}
+                onSubmit={passwordForm.handleSubmit(handleChangePassword)}
               >
                 <FormField
                   control={passwordForm.control}

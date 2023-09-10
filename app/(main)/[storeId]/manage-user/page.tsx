@@ -1,6 +1,7 @@
 "use client";
 
 import { DeleteUserButton } from "@/components/delete-user-button";
+import LoadingIndicator from "@/components/loading-indicator";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -110,6 +111,8 @@ const UserTile = ({
 
 const ManageUser = () => {
   const userStore = useUserModal();
+
+  const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
 
@@ -130,6 +133,8 @@ const ManageUser = () => {
 
       setUsers(response.data?.users);
       setCurrentUser(response.data?.currentUser);
+
+      setLoading(false);
     };
 
     getProfile();
@@ -154,10 +159,12 @@ const ManageUser = () => {
         setUsers(response.data?.users);
       }
     } catch (error) {
-      toast.success("User gagal ditambahkan");
       console.log(error);
+      toast.success("User gagal ditambahkan");
     }
   }
+
+  if (loading) return <LoadingIndicator />;
 
   return (
     <div className="mx-auto my-8 w-4/5 p-8 bg-slate-50 shadow-lg rounded-lg">
@@ -242,8 +249,8 @@ const ManageUser = () => {
           <Separator orientation="vertical" className="h-[36rem]" />
           <div className="w-2/5 flex flex-col gap-2">
             <Subheading
-              title="Tambah/Perbaharui user"
-              description="Tambah atau perbaharui user yang dapat mengakses toko anda"
+              title="Tambah user"
+              description="Tambah user yang dapat mengakses toko anda"
               icon={<UsersIcon className="w-8 h-8" />}
             />
             <Separator />

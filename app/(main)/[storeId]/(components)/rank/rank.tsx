@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingIndicator from "@/components/loading-indicator";
 import { Subheading } from "@/components/ui/subheading";
 import axios from "axios";
 import { Loader2Icon, MedalIcon } from "lucide-react";
@@ -34,11 +35,7 @@ const Rank = () => {
   }, [params.storeId]);
 
   if (loading) {
-    return (
-      <div className="w-full flex items-center justify-center p-16">
-        <Loader2Icon className="w-8 h-8 animate-spin" />
-      </div>
-    );
+    return <LoadingIndicator />;
   }
 
   return (

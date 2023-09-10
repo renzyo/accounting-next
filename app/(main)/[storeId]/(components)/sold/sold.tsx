@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingIndicator from "@/components/loading-indicator";
 import { Overview } from "@/components/overview";
 import { Subheading } from "@/components/ui/subheading";
 import axios from "axios";
@@ -33,9 +34,7 @@ const Sold = () => {
 
   if (loading) {
     return (
-      <div className="w-full flex items-center justify-center p-16">
-        <Loader2Icon className="w-8 h-8 animate-spin" />
-      </div>
+      <LoadingIndicator />
     );
   }
 
