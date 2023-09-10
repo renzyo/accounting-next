@@ -1,13 +1,24 @@
-import { GlobalError, SuccessResponse } from "@/lib/helper";
+import { GlobalError, SuccessResponse, UnauthorizedError } from "@/lib/helper";
 import prismadb from "@/lib/prisma";
 import { hash } from "bcryptjs";
 import { NextRequest } from "next/server";
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+export async function PUT(req: NextRequest) {
   try {
+    const userId = req.cookies.get("userId")?.value;
+
+    const user = await prismadb.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!userId || user?.role !== "ADMIN") {
+      return UnauthorizedError({
+        message: "You are not authorized to access this resource.",
+      });
+    }
+
     const { id, name, email, role, password, updatePassword } =
       await req.json();
     let hashedPassword = "";
@@ -77,6 +88,19 @@ export async function DELETE(
 ) {
   try {
     const currentUserId = req.cookies.get("userId")?.value;
+
+    const currentUser = await prismadb.user.findUnique({
+      where: {
+        id: currentUserId,
+      },
+    });
+
+    if (!currentUserId || currentUser?.role !== "ADMIN") {
+      return UnauthorizedError({
+        message: "You are not authorized to access this resource.",
+      });
+    }
+
     const { userId } = params;
 
     await prismadb.user.delete({

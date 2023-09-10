@@ -26,14 +26,21 @@ export async function POST(
 ) {
   try {
     const userId = req.cookies.get("userId")?.value;
-    const body = await req.json();
-    const { merchantId, productId, quantity, saleDate } = body;
 
-    if (!userId) {
+    const user = await prismadb.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!userId || (user?.role !== "ADMIN" && user?.role !== "SALES_MANAGER")) {
       return UnauthorizedError({
         message: "You are not authorized to access this resource.",
       });
     }
+
+    const body = await req.json();
+    const { merchantId, productId, quantity, saleDate } = body;
 
     const product = await prismadb.product.findUnique({
       where: {

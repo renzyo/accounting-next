@@ -7,13 +7,30 @@ import {
   uploadBytes,
 } from "firebase/storage";
 import { storage } from "@/lib/firebase";
-import { GlobalError, SuccessResponse } from "@/lib/helper";
+import { GlobalError, SuccessResponse, UnauthorizedError } from "@/lib/helper";
 
 export async function PUT(
   req: NextRequest,
   { params }: { params: { storeId: string; productId: string } }
 ) {
   try {
+    const userId = req.cookies.get("userId")?.value;
+
+    const user = await prismadb.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (
+      !userId ||
+      (user?.role !== "ADMIN" && user?.role !== "PRODUCT_MANAGER")
+    ) {
+      return UnauthorizedError({
+        message: "You are not authorized to access this resource.",
+      });
+    }
+
     const formData = await req.formData();
     const previousImageId = formData.get("previousImageId") as string;
     const previousImageUrl = formData.get("previousImageUrl") as string;
@@ -84,6 +101,23 @@ export async function DELETE(
   { params }: { params: { storeId: string; productId: string } }
 ) {
   try {
+    const userId = req.cookies.get("userId")?.value;
+
+    const user = await prismadb.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (
+      !userId ||
+      (user?.role !== "ADMIN" && user?.role !== "PRODUCT_MANAGER")
+    ) {
+      return UnauthorizedError({
+        message: "You are not authorized to access this resource.",
+      });
+    }
+
     const product = await prismadb.product.findUnique({
       where: {
         id: params.productId as string,

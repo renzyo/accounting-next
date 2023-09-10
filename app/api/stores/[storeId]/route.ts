@@ -1,4 +1,4 @@
-import { GlobalError, SuccessResponse } from "@/lib/helper";
+import { GlobalError, SuccessResponse, UnauthorizedError } from "@/lib/helper";
 import prismadb from "@/lib/prisma";
 import { NextRequest } from "next/server";
 
@@ -7,6 +7,20 @@ export async function PUT(
   { params }: { params: { storeId: string } }
 ) {
   try {
+    const userId = req.cookies.get("userId")?.value;
+
+    const user = await prismadb.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!userId || user?.role !== "ADMIN") {
+      return UnauthorizedError({
+        message: "You are not authorized to access this resource.",
+      });
+    }
+
     const storeId = params.storeId as string;
 
     const body = await req.json();
@@ -32,6 +46,20 @@ export async function DELETE(
   { params }: { params: { storeId: string } }
 ) {
   try {
+    const userId = req.cookies.get("userId")?.value;
+
+    const user = await prismadb.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!userId || user?.role !== "ADMIN") {
+      return UnauthorizedError({
+        message: "You are not authorized to access this resource.",
+      });
+    }
+
     const storeId = params.storeId as string;
 
     await prismadb.store.delete({

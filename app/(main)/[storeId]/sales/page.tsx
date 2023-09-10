@@ -1,6 +1,10 @@
 import { DataTable } from "@/components/ui/data-table";
 import { PackageCheck } from "lucide-react";
-import { SalesColumn, SalesColumns } from "./columns";
+import {
+  SalesColumn,
+  SalesColumns,
+  SalesColumnsWithoutAction,
+} from "./columns";
 import prismadb from "@/lib/prisma";
 import AddSale from "./add-sale-button";
 import SetProduct from "@/app/(main)/[storeId]/set-product";
@@ -71,7 +75,11 @@ export default async function Sales({
       </header>
       <div className="mt-8">
         <DataTable
-          columns={SalesColumns}
+          columns={
+            user?.role === "ADMIN" || user?.role === "SALES_MANAGER"
+              ? SalesColumns
+              : SalesColumnsWithoutAction
+          }
           data={formattedSales}
           searchKey="product"
           placeholder="Cari Produk..."

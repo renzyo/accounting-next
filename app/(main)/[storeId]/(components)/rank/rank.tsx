@@ -82,7 +82,7 @@ const Rank = () => {
           <div className="w-full md:w-1/2">
             <div className="w-full p-4 bg-slate-100 rounded-lg">
               <Subheading
-                title="5 Produk Tidak Laku"
+                title="5 Produk Kurang Menarik"
                 description="Produk dengan penjualan terendah"
                 icon
               />

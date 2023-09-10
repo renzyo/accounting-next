@@ -4,7 +4,11 @@ import prismadb from "@/lib/prisma";
 import AddProduct from "./add-product-button";
 import SetProduct from "@/app/(main)/[storeId]/set-product";
 import { Heading } from "@/components/ui/heading";
-import { ProductColumn, ProductColumns } from "./columns";
+import {
+  ProductColumn,
+  ProductColumns,
+  ProductColumnsWithoutAction,
+} from "./columns";
 import { cookies } from "next/headers";
 
 export default async function Product({
@@ -57,7 +61,11 @@ export default async function Product({
       </header>
       <div className="mt-8">
         <DataTable
-          columns={ProductColumns}
+          columns={
+            user?.role === "ADMIN" || user?.role === "PRODUCT_MANAGER"
+              ? ProductColumns
+              : ProductColumnsWithoutAction
+          }
           data={formattedProduct}
           searchKey="name"
           placeholder="Cari Produk..."
