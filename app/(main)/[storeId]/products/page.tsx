@@ -5,6 +5,7 @@ import AddProduct from "./add-product-button";
 import SetProduct from "@/app/(main)/[storeId]/set-product";
 import { Heading } from "@/components/ui/heading";
 import { ProductColumn, ProductColumns } from "./columns";
+import { cookies } from "next/headers";
 
 export default async function Product({
   params,
@@ -13,6 +14,14 @@ export default async function Product({
     storeId: string;
   };
 }) {
+  const userId = cookies().get("userId")?.value;
+
+  const user = await prismadb.user.findFirst({
+    where: {
+      id: userId,
+    },
+  });
+
   const storeId = params.storeId as string;
 
   const products = await prismadb.product.findMany({
@@ -41,7 +50,9 @@ export default async function Product({
         />
         <div className="flex ml-auto">
           <SetProduct products={products} />
-          <AddProduct products={products} />
+          {(user?.role === "ADMIN" || user?.role === "PRODUCT_MANAGER") && (
+            <AddProduct products={products} />
+          )}
         </div>
       </header>
       <div className="mt-8">

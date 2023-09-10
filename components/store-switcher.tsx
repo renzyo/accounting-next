@@ -21,7 +21,7 @@ import {
   CommandSeparator,
 } from "./ui/command";
 import { cn } from "@/lib/utils";
-import { Store } from "@prisma/client";
+import { Store, User } from "@prisma/client";
 import { useAddStoreModal } from "@/hooks/use-add-store-modal";
 import { useStoreList } from "@/hooks/use-store-list-modal";
 
@@ -31,9 +31,10 @@ type PopoverTriggerProps = React.ComponentPropsWithoutRef<
 
 interface StoreSwitcherProps extends PopoverTriggerProps {
   items: Store[];
+  user: User;
 }
 
-const StoreSwitcher: FC<StoreSwitcherProps> = ({ className, items }) => {
+const StoreSwitcher: FC<StoreSwitcherProps> = ({ className, items, user }) => {
   const storeModal = useAddStoreModal();
   const storeList = useStoreList();
   const params = useParams();
@@ -97,29 +98,33 @@ const StoreSwitcher: FC<StoreSwitcherProps> = ({ className, items }) => {
               ))}
             </CommandGroup>
           </CommandList>
-          <CommandSeparator />
-          <CommandList>
-            <CommandGroup>
-              <CommandItem
-                onSelect={() => {
-                  setOpen(false);
-                  storeList.onOpen();
-                }}
-              >
-                <SettingsIcon className="mr-2 h-5 w-5" />
-                Kelola Toko
-              </CommandItem>
-              <CommandItem
-                onSelect={() => {
-                  setOpen(false);
-                  storeModal.onOpen();
-                }}
-              >
-                <PlusCircle className="mr-2 h-5 w-5" />
-                Tambah Toko
-              </CommandItem>
-            </CommandGroup>
-          </CommandList>
+          {user.role === "ADMIN" && (
+            <>
+              <CommandSeparator />
+              <CommandList>
+                <CommandGroup>
+                  <CommandItem
+                    onSelect={() => {
+                      setOpen(false);
+                      storeList.onOpen();
+                    }}
+                  >
+                    <SettingsIcon className="mr-2 h-5 w-5" />
+                    Kelola Toko
+                  </CommandItem>
+                  <CommandItem
+                    onSelect={() => {
+                      setOpen(false);
+                      storeModal.onOpen();
+                    }}
+                  >
+                    <PlusCircle className="mr-2 h-5 w-5" />
+                    Tambah Toko
+                  </CommandItem>
+                </CommandGroup>
+              </CommandList>
+            </>
+          )}
         </Command>
       </PopoverContent>
     </Popover>

@@ -12,6 +12,7 @@ export type SalesColumn = {
   id: string;
   merchant: Merchant;
   product: Product;
+  addedBy: string;
   saleDate: Date;
   quantity: string;
 };
@@ -40,6 +41,27 @@ export const SalesColumns: ColumnDef<SalesColumn>[] = [
         {format(row.original.saleDate, "PPP", {
           locale: id,
         })}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "addedBy",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Ditambahkan oleh
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <span>
+        {row.original.addedBy === "Deleted User"
+          ? "Deleted User"
+          : row.original.addedBy}
       </span>
     ),
   },

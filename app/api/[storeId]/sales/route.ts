@@ -1,4 +1,4 @@
-import { GlobalError, SuccessResponse } from "@/lib/helper";
+import { GlobalError, SuccessResponse, UnauthorizedError } from "@/lib/helper";
 import prismadb from "@/lib/prisma";
 import { NextRequest } from "next/server";
 
@@ -25,69 +25,52 @@ export async function POST(
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const userId = req.headers.get("x-user-id")!;
+    const userId = req.cookies.get("userId")?.value;
     const body = await req.json();
-    const { type } = body;
+    const { merchantId, productId, quantity, saleDate } = body;
 
-    if (type === "single") {
-      const { merchantId, productId, quantity, saleDate } = body;
-
-      const product = await prismadb.product.findUnique({
-        where: {
-          id: productId,
-        },
+    if (!userId) {
+      return UnauthorizedError({
+        message: "You are not authorized to access this resource.",
       });
+    }
 
-      if (product?.stock! !== 0) {
-        if (product?.stock! < quantity) {
-          return GlobalError({
-            message: "The quantity is greater than the stock.",
-            errorCode: 400,
-          });
-        }
+    const product = await prismadb.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
 
-        await prismadb.product.update({
-          where: {
-            id: productId,
-          },
-          data: {
-            stock: product?.stock! - quantity,
-          },
+    if (product?.stock! !== 0) {
+      if (product?.stock! < quantity) {
+        return GlobalError({
+          message: "The quantity is greater than the stock.",
+          errorCode: 400,
         });
       }
 
-      const sales = await prismadb.sales.create({
+      await prismadb.product.update({
+        where: {
+          id: productId,
+        },
         data: {
-          storeId: params.storeId,
-          merchantId,
-          userId,
-          productId: productId,
-          saleDate: saleDate,
-          quantity,
+          stock: product?.stock! - quantity,
         },
       });
-
-      return SuccessResponse(sales);
-    } else if (type === "bulk") {
-      const { sales } = body;
-
-      const salesData = await Promise.all(
-        sales.map((sale: any) => {
-          return prismadb.sales.create({
-            data: {
-              storeId: params.storeId,
-              userId,
-              merchantId: sale.merchantId,
-              productId: sale.productId,
-              saleDate: new Date(),
-              quantity: sale.quantity,
-            },
-          });
-        })
-      );
-
-      return SuccessResponse(salesData);
     }
+
+    const sales = await prismadb.sales.create({
+      data: {
+        storeId: params.storeId,
+        merchantId,
+        userId,
+        productId: productId,
+        saleDate: saleDate,
+        quantity,
+      },
+    });
+
+    return SuccessResponse(sales);
   } catch (error: any) {
     console.error(error);
     return GlobalError(error);

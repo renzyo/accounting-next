@@ -160,7 +160,7 @@ const ManageUser = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.success("User gagal ditambahkan");
+      toast.error("User gagal ditambahkan");
     }
   }
 

@@ -5,6 +5,7 @@ import prismadb from "@/lib/prisma";
 import AddSale from "./add-sale-button";
 import SetProduct from "@/app/(main)/[storeId]/set-product";
 import { Heading } from "@/components/ui/heading";
+import { cookies } from "next/headers";
 
 export default async function Sales({
   params,
@@ -13,6 +14,14 @@ export default async function Sales({
     storeId: string;
   };
 }) {
+  const userId = cookies().get("userId")?.value;
+
+  const user = await prismadb.user.findFirst({
+    where: {
+      id: userId,
+    },
+  });
+
   const storeId = params.storeId as string;
 
   const sales = await prismadb.sales.findMany({
@@ -22,6 +31,11 @@ export default async function Sales({
     include: {
       product: true,
       merchant: true,
+      user: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
 
@@ -33,6 +47,7 @@ export default async function Sales({
 
   const formattedSales: SalesColumn[] = sales.map((sales) => ({
     id: sales.id,
+    addedBy: sales.user.name ?? "Deleted User",
     merchant: sales.merchant,
     product: sales.product,
     saleDate: sales.saleDate,
@@ -49,7 +64,9 @@ export default async function Sales({
         />
         <div className="flex ml-auto gap-4">
           <SetProduct products={products} />
-          <AddSale />
+          {(user?.role === "ADMIN" || user?.role === "SALES_MANAGER") && (
+            <AddSale />
+          )}
         </div>
       </header>
       <div className="mt-8">
