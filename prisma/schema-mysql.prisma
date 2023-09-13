@@ -6,12 +6,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  id               String   @id @default(uuid())
   email            String   @unique
   name             String?
   password         String
@@ -23,7 +23,7 @@ model User {
 }
 
 model Store {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  id          String    @id @default(uuid())
   name        String
   description String?
   products    Product[] @relation("StoreToProduct")
@@ -33,8 +33,8 @@ model Store {
 }
 
 model Product {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  storeId        String   @db.ObjectId
+  id             String   @id @default(uuid())
+  storeId        String
   store          Store    @relation("StoreToProduct", fields: [storeId], references: [id])
   imageId        String?
   imageUrl       String?
@@ -48,7 +48,7 @@ model Product {
 }
 
 model Merchant {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid())
   name      String
   Sales     Sales[]
   createdAt DateTime @default(now())
@@ -56,14 +56,14 @@ model Merchant {
 }
 
 model Sales {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  merchantId String   @db.ObjectId
+  id         String   @id @default(uuid())
+  merchantId String
   merchant   Merchant @relation(fields: [merchantId], references: [id])
-  storeId    String   @db.ObjectId
+  storeId    String
   store      Store    @relation("StoreToSales", fields: [storeId], references: [id])
-  userId     String   @db.ObjectId
+  userId     String
   user       User     @relation(fields: [userId], references: [id])
-  productId  String   @db.ObjectId
+  productId  String
   product    Product  @relation("ProductToSales", fields: [productId], references: [id])
   saleDate   DateTime @default(now())
   quantity   Int
