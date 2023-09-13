@@ -113,6 +113,7 @@ const ManageUser = () => {
   const userStore = useUserModal();
 
   const [loading, setLoading] = useState(true);
+  const [formLoading, setFormLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
 
@@ -142,6 +143,8 @@ const ManageUser = () => {
 
   async function handleAddUser(values: z.infer<typeof userFormSchema>) {
     try {
+      setFormLoading(true);
+
       const user = {
         name: values.name,
         email: values.email,
@@ -161,6 +164,8 @@ const ManageUser = () => {
     } catch (error) {
       console.log(error);
       toast.error("User gagal ditambahkan");
+    } finally {
+      setFormLoading(false);
     }
   }
 
@@ -267,6 +272,7 @@ const ManageUser = () => {
                       <FormLabel>Nama User</FormLabel>
                       <FormControl>
                         <Input
+                          disabled={formLoading}
                           type="text"
                           placeholder="Masukkan nama user"
                           {...field}
@@ -284,6 +290,7 @@ const ManageUser = () => {
                       <FormLabel>Email User</FormLabel>
                       <FormControl>
                         <Input
+                          disabled={formLoading}
                           type="email"
                           placeholder="Masukkan email user"
                           {...field}
@@ -303,6 +310,7 @@ const ManageUser = () => {
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                         value={field.value}
+                        disabled={formLoading}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -333,6 +341,7 @@ const ManageUser = () => {
                       <FormLabel>Password user</FormLabel>
                       <FormControl>
                         <Input
+                          disabled={formLoading}
                           type="password"
                           placeholder="Masukkan password user"
                           {...field}
@@ -350,6 +359,7 @@ const ManageUser = () => {
                       <FormLabel>Konfirmasi Password user</FormLabel>
                       <FormControl>
                         <Input
+                          disabled={formLoading}
                           type="password"
                           placeholder="Konfirmasi password user"
                           {...field}
@@ -359,7 +369,7 @@ const ManageUser = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full" disabled={formLoading}>
                   Tambah User
                 </Button>
               </form>
