@@ -87,11 +87,7 @@ export async function DELETE(
       },
     });
 
-    if (
-      !userId ||
-      user?.role !== "ADMIN" &&
-      user?.role !== "SALES_MANAGER"
-    ) {
+    if (!userId || (user?.role !== "ADMIN" && user?.role !== "SALES_MANAGER")) {
       return UnauthorizedError({
         message: "You are not authorized to access this resource.",
       });

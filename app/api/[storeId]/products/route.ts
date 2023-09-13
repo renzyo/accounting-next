@@ -19,8 +19,7 @@ export async function GET(
 
     if (
       !userId ||
-      user?.role !== "ADMIN" &&
-      user?.role !== "PRODUCT_MANAGER"
+      (user?.role !== "ADMIN" && user?.role !== "PRODUCT_MANAGER")
     ) {
       return UnauthorizedError({
         message: "You are not authorized to access this resource.",
