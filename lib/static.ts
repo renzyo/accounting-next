@@ -1,2 +1,2 @@
-export const appName = "Accounting";
-export const appDesc = "Accounting app";
+export const appName = "Store Management";
+export const appDesc = "Manage your store with ease.";
