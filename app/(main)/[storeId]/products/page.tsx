@@ -1,48 +1,84 @@
+"use client";
+
 import { DataTable } from "@/components/ui/data-table";
 import { Package } from "lucide-react";
-import prismadb from "@/lib/prisma";
 import AddProduct from "./add-product-button";
-import SetProduct from "@/app/(main)/[storeId]/set-product";
 import { Heading } from "@/components/ui/heading";
 import {
   ProductColumn,
   ProductColumns,
   ProductColumnsWithoutAction,
 } from "./columns";
-import { cookies } from "next/headers";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { ProductData, UserData } from "@/lib/types";
+import { useProduct } from "@/hooks/use-product";
+import LoadingIndicator from "@/components/loading-indicator";
 
-export default async function Product({
+export default function Product({
   params,
 }: {
   params: {
     storeId: string;
   };
 }) {
-  const userId = cookies().get("userId")?.value;
+  const productStore = useProduct();
 
-  const user = await prismadb.user.findFirst({
-    where: {
-      id: userId,
-    },
-  });
+  const [loading, setLoading] = useState<boolean[]>([true, true]);
+  const [user, setUser] = useState<UserData>();
+  const [formattedProduct, setFormattedProduct] = useState<ProductColumn[]>([]);
 
-  const storeId = params.storeId as string;
+  useEffect(() => {
+    async function getProducts() {
+      try {
+        const response = await axios.get(`/api/${params.storeId}/products`);
+        const products = response.data.products as ProductData[];
 
-  const products = await prismadb.product.findMany({
-    where: {
-      storeId,
-    },
-  });
+        const tempProducts: ProductColumn[] = products.map((product) => ({
+          id: product.id,
+          imageId: product.imageId ?? "",
+          image: product.imageUrl ?? "",
+          name: product.name,
+          description: product.description ?? "-",
+          stockThreshold: product.stockThreshold.toString(),
+          stock: product.stock.toString(),
+        }));
 
-  const formattedProduct: ProductColumn[] = products.map((product) => ({
-    id: product.id,
-    imageId: product.imageId ?? "",
-    image: product.imageUrl ?? "",
-    name: product.name,
-    description: product.description ?? "-",
-    stockThreshold: product.stockThreshold.toString(),
-    stock: product.stock.toString(),
-  }));
+        setFormattedProduct(tempProducts);
+      } catch (error) {
+        console.log(error);
+        toast.error("Gagal memuat produk");
+      } finally {
+        setLoading((prev: any) => [false, prev[1]]);
+      }
+    }
+
+    async function getUserData() {
+      try {
+        const response = await axios.get("/api/auth/profile");
+        const user = response.data.user as UserData;
+
+        setUser(user);
+      } catch (error) {
+        console.log(error);
+        toast.error("Gagal memuat data pengguna");
+      } finally {
+        setLoading((prev) => [prev[0], false]);
+      }
+    }
+
+    if (productStore.productUpdated) {
+      productStore.setProductUpdated(false);
+    }
+    console.log("render");
+    getProducts();
+    getUserData();
+  }, [params.storeId, productStore]);
+
+  if (loading.some((load) => load)) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <section className="mx-auto my-8 w-4/5 p-8 bg-slate-50 shadow-lg rounded-lg">
@@ -53,9 +89,8 @@ export default async function Product({
           description="Produk yang terdapat pada toko anda"
         />
         <div className="flex ml-auto">
-          <SetProduct products={products} />
           {(user?.role === "ADMIN" || user?.role === "PRODUCT_MANAGER") && (
-            <AddProduct products={products} />
+            <AddProduct />
           )}
         </div>
       </header>
@@ -74,4 +109,3 @@ export default async function Product({
     </section>
   );
 }
-

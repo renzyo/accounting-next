@@ -3,7 +3,7 @@
 import LoadingIndicator from "@/components/loading-indicator";
 import { Subheading } from "@/components/ui/subheading";
 import axios from "axios";
-import { Loader2Icon, MedalIcon } from "lucide-react";
+import { MedalIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 

@@ -4,14 +4,19 @@ import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { CellAction } from "./cell-action";
-import { Merchant, Product } from "@prisma/client";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import id from "date-fns/locale/id";
 
 export type SalesColumn = {
   id: string;
-  merchant: Merchant;
-  product: Product;
+  merchant: {
+    id: string;
+    name: string;
+  };
+  product: {
+    id: string;
+    name: string;
+  };
   addedBy: string;
   saleDate: Date;
   quantity: string;

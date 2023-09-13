@@ -1,3 +1,5 @@
+"use client";
+
 import { DataTable } from "@/components/ui/data-table";
 import { PackageCheck } from "lucide-react";
 import {
@@ -5,58 +7,79 @@ import {
   SalesColumns,
   SalesColumnsWithoutAction,
 } from "./columns";
-import prismadb from "@/lib/prisma";
 import AddSale from "./add-sale-button";
-import SetProduct from "@/app/(main)/[storeId]/set-product";
 import { Heading } from "@/components/ui/heading";
-import { cookies } from "next/headers";
+import { SalesData, UserData } from "@/lib/types";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import LoadingIndicator from "@/components/loading-indicator";
+import { useSaleModal } from "@/hooks/use-sale-modal";
 
-export default async function Sales({
+export default function Sales({
   params,
 }: {
   params: {
     storeId: string;
   };
 }) {
-  const userId = cookies().get("userId")?.value;
+  const saleModalStore = useSaleModal();
+  const [loading, setLoading] = useState<boolean[]>([true, true]);
+  const [formattedSales, setFormattedSales] = useState<SalesColumn[]>([]);
+  const [user, setUser] = useState<UserData>();
 
-  const user = await prismadb.user.findFirst({
-    where: {
-      id: userId,
-    },
-  });
+  useEffect(() => {
+    async function getSalesData() {
+      try {
+        const response = await axios.get(`/api/${params.storeId}/sales`);
+        const sales = response.data.sales as SalesData[];
 
-  const storeId = params.storeId as string;
+        const tempSales: SalesColumn[] = sales.map((sales) => ({
+          id: sales.id,
+          addedBy: sales.addedBy,
+          merchant: {
+            id: sales.merchantId,
+            name: sales.merchantName,
+          },
+          product: {
+            id: sales.productId,
+            name: sales.productName,
+          },
+          saleDate: new Date(sales.saleDate),
+          quantity: sales.quantity.toString(),
+        }));
 
-  const sales = await prismadb.sales.findMany({
-    where: {
-      storeId,
-    },
-    include: {
-      product: true,
-      merchant: true,
-      user: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
+        setFormattedSales(tempSales);
+      } catch (error) {
+        console.log(error);
+        toast.error("Gagal memuat penjualan");
+      } finally {
+        setLoading((prev) => [false, prev[1]]);
+      }
+    }
 
-  const products = await prismadb.product.findMany({
-    where: {
-      storeId,
-    },
-  });
+    async function getUserData() {
+      try {
+        const response = await axios.get("/api/auth/profile");
+        setUser(response.data.user);
+      } catch (error) {
+        console.log(error);
+        toast.error("Gagal memuat data pengguna");
+      } finally {
+        setLoading((prev) => [prev[0], false]);
+      }
+    }
 
-  const formattedSales: SalesColumn[] = sales.map((sales) => ({
-    id: sales.id,
-    addedBy: sales.user.name ?? "Deleted User",
-    merchant: sales.merchant,
-    product: sales.product,
-    saleDate: sales.saleDate,
-    quantity: sales.quantity.toString(),
-  }));
+    if (saleModalStore.saleUpdated) {
+      saleModalStore.setSaleUpdated(false);
+    }
+    getSalesData();
+    getUserData();
+  }, [params.storeId, saleModalStore]);
+
+  if (loading.some((load) => load)) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <section className="mx-auto my-8 w-4/5 p-8 bg-slate-50 shadow-lg rounded-lg">
@@ -67,7 +90,6 @@ export default async function Sales({
           description="Daftar penjualan yang telah dilakukan"
         />
         <div className="flex ml-auto gap-4">
-          <SetProduct products={products} />
           {(user?.role === "ADMIN" || user?.role === "SALES_MANAGER") && (
             <AddSale />
           )}

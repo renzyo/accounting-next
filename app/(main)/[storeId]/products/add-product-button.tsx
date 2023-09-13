@@ -2,19 +2,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useProduct } from "@/hooks/use-product";
 import { useProductModal } from "@/hooks/use-product-modal";
-import { Product } from "@prisma/client";
 import { PlusIcon } from "lucide-react";
-import React, { useEffect } from "react";
+import React from "react";
 
-const AddProduct = ({ products }: { products: Product[] }) => {
+const AddProduct = () => {
   const productModalStore = useProductModal();
-  const productStore = useProduct();
-
-  useEffect(() => {
-    productStore.setProducts(products);
-  }, []);
 
   return (
     <Button onClick={() => productModalStore.onOpen()}>

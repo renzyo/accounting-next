@@ -39,7 +39,12 @@ export default function Login() {
   const onSubmit = async (values: loginSchema) => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/auth/login", values);
+      const data = {
+        email: values.email.toLowerCase(),
+        password: values.password,
+      };
+
+      const response = await axios.post("/api/auth/login", data);
 
       if (response.status === 200) {
         router.push("/");

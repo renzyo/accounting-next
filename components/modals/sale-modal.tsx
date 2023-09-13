@@ -39,6 +39,7 @@ import {
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "../ui/calendar";
+import { ProductData } from "@/lib/types";
 
 const formSchema = z.object({
   id: z.string().min(1),
@@ -52,12 +53,34 @@ const formSchema = z.object({
 
 export const SaleModal = () => {
   const saleModalStore = useSaleModal();
+  const productListStore = useProduct();
   const merchantListStore = useMerchantList();
-  const productStore = useProduct();
   const params = useParams();
   const router = useRouter();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<ProductData[]>([]);
+
+  useEffect(() => {
+    async function getProducts() {
+      try {
+        const response = await axios.get(`/api/${params.storeId}/products`);
+        const products = response.data.products as ProductData[];
+
+        setProducts(products);
+      } catch (error) {
+        console.log(error);
+        toast.error("Gagal memuat produk");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (productListStore.productUpdated) {
+      productListStore.setProductUpdated(false);
+    }
+    getProducts();
+  }, [params.storeId, productListStore]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -111,9 +134,10 @@ export const SaleModal = () => {
         toast.success("Penjualan berhasil ditambahkan");
       }
 
-      saleModalStore.onClose();
       form.reset();
       router.refresh();
+      saleModalStore.setSaleUpdated(true);
+      saleModalStore.onClose();
     } catch (error) {
       toast.error(
         "Tidak dapat menambahkan penjualan. Pastikan stok produk mencukupi."
@@ -157,6 +181,7 @@ export const SaleModal = () => {
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
+                        disabled={loading}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -198,6 +223,7 @@ export const SaleModal = () => {
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
+                        disabled={loading}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -205,16 +231,20 @@ export const SaleModal = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <ScrollArea className="h-[200px]">
-                            {productStore.products.map((product) => (
-                              <SelectItem
-                                value={product.id}
-                                key={product.id}
-                                placeholder="Pilih produk..."
-                              >
-                                {product.name}
-                              </SelectItem>
-                            ))}
+                          <ScrollArea className="min-h-[50px]">
+                            {products.length === 0 ? (
+                              <p>Belum ada produk</p>
+                            ) : (
+                              products.map((product) => (
+                                <SelectItem
+                                  value={product.id}
+                                  key={product.id}
+                                  placeholder="Pilih produk..."
+                                >
+                                  {product.name}
+                                </SelectItem>
+                              ))
+                            )}
                           </ScrollArea>
                         </SelectContent>
                       </Select>
@@ -238,6 +268,7 @@ export const SaleModal = () => {
                                   "w-full justify-start text-left font-normal",
                                   !field.value && "text-muted-foreground"
                                 )}
+                                disabled={loading}
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value ? (

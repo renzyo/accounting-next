@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useProductModal } from "@/hooks/use-product-modal";
 import { useParams, useRouter } from "next/navigation";
+import { useProduct } from "@/hooks/use-product";
 
 const formSchema = z.object({
   id: z.string().min(1),
@@ -31,6 +32,7 @@ const formSchema = z.object({
 
 export const ProductModal = () => {
   const productStore = useProductModal();
+  const productListStore = useProduct();
   const params = useParams();
   const router = useRouter();
 
@@ -111,6 +113,7 @@ export const ProductModal = () => {
       router.refresh();
       setFile(null);
       form.reset();
+      productListStore.setProductUpdated(true);
       productStore.onClose();
     } catch (error) {
       toast.error("Terjadi kesalahan pada server.");

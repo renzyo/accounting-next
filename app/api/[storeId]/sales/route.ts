@@ -11,9 +11,25 @@ export async function GET(
       where: {
         storeId: params.storeId as string,
       },
+      include: {
+        product: true,
+        merchant: true,
+        user: true,
+      },
     });
 
-    return SuccessResponse(sales);
+    return SuccessResponse({
+      sales: sales.map((sale) => ({
+        id: sale.id,
+        addedBy: sale.user?.name ?? "Deleted User",
+        merchantId: sale.merchantId,
+        merchantName: sale.merchant?.name ?? "Deleted Merchant",
+        productId: sale.productId,
+        productName: sale.product?.name ?? "Deleted Product",
+        saleDate: sale.saleDate,
+        quantity: sale.quantity,
+      })),
+    });
   } catch (error: any) {
     console.error(error);
     return GlobalError(error);

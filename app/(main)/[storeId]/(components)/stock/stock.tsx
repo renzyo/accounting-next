@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { StockColumn, StockColumns } from "./columns";
 import { StockDataTable } from "./data-table";
-import { Loader2Icon, PackageXIcon } from "lucide-react";
+import { PackageXIcon } from "lucide-react";
 import { Subheading } from "@/components/ui/subheading";
 import LoadingIndicator from "@/components/loading-indicator";
 

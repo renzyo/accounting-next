@@ -32,7 +32,9 @@ export async function GET(
       },
     });
 
-    return SuccessResponse(products);
+    return SuccessResponse({
+      products,
+    });
   } catch (error: any) {
     console.error(error);
     return GlobalError(error);

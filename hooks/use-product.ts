@@ -1,12 +1,16 @@
-import { Product } from "@prisma/client";
+import { ProductData } from "@/lib/types";
 import { create } from "zustand";
 
 interface useProductStore {
-  products: Product[];
-  setProducts: (products: Product[]) => void;
+  products: ProductData[];
+  productUpdated: boolean;
+  setProducts: (products: ProductData[]) => void;
+  setProductUpdated: (productUpdated: boolean) => void;
 }
 
 export const useProduct = create<useProductStore>((set) => ({
   products: [],
+  productUpdated: false,
   setProducts: (products) => set({ products }),
+  setProductUpdated: (productUpdated) => set({ productUpdated }),
 }));
