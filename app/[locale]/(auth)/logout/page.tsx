@@ -11,10 +11,12 @@ const Logout = () => {
   useEffect(() => {
     const getLogout = async () => {
       try {
-        const response = await axios.get("/api/auth/logout");
+        const response = await axios.post("/api/auth/logout", {
+          key: "static_key",
+        });
 
         if (response.status === 200) {
-          window.location.assign("/");
+          window.location.assign("/en/login");
         }
       } catch (error) {
         console.log(error);

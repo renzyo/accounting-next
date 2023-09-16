@@ -21,19 +21,6 @@ export default function DropdownContent({ name }: DropdownContentProps) {
   const params = useParams();
   const router = useRouter();
 
-  async function handleLogout() {
-    try {
-      const response = await axios.get("/api/auth/logout");
-
-      if (response.status === 200) {
-        toast.success("Logged out");
-        window.location.assign("/en/login");
-      }
-    } catch (error) {
-      toast.error("Something went wrong");
-    }
-  }
-
   return (
     <DropdownMenuContent align="end">
       <DropdownMenuLabel>{name}</DropdownMenuLabel>
@@ -52,7 +39,13 @@ export default function DropdownContent({ name }: DropdownContentProps) {
       >
         {t("manageUserButton")}
       </DropdownMenuItem>
-      <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+      <DropdownMenuItem
+        onClick={() => {
+          router.push(`/${lang}/logout`);
+        }}
+      >
+        Logout
+      </DropdownMenuItem>
     </DropdownMenuContent>
   );
 }

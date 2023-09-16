@@ -1,13 +1,23 @@
-import { SuccessResponse } from "@/lib/helper";
+import { GlobalError, SuccessResponse } from "@/lib/helper";
+import { NextRequest } from "next/server";
 
-export async function GET() {
-  const response = SuccessResponse({ message: "Logout successful." });
+export async function POST(req: NextRequest) {
+  const { key } = await req.json();
 
-  await Promise.all([
-    response.cookies.delete("token"),
-    response.cookies.delete("userId"),
-    response.cookies.delete("loggedIn"),
-  ]);
+  if (key === "static_key") {
+    const response = SuccessResponse({ message: "Logout successful." });
 
-  return response;
+    await Promise.all([
+      response.cookies.delete("token"),
+      response.cookies.delete("userId"),
+      response.cookies.delete("loggedIn"),
+    ]);
+
+    return response;
+  } else {
+    return GlobalError({
+      message: "Invalid key.",
+      errorCode: 400,
+    });
+  }
 }
