@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     return response;
   } else {
     return GlobalError({
-      message: "Invalid key.",
+      message: "Invalid key",
       errorCode: 400,
     });
   }
