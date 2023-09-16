@@ -9,8 +9,19 @@ Store Product and Sales Management Website built using Next and Typescript.
 1. Fill in all the environment variables.
 1. Run ```npm install``` to install all dependencies.
 1. Run ```npm run dev``` to start the development server.
-1. Register a new account.
+1. Register new admin account by sending a POST request to ```http://localhost:3000/api/auth/register``` with the following body (can only be done once):
+
+    ```json
+    {
+        "name": "John Doe",
+        "email": "johndoe@email.com",
+        "password": "johndoe123",
+        "passwordConfirmation": "johndoe123"
+    }
+    ```
+
 1. Open ```http://localhost:3000``` in your browser.
+1. Login with the admin account.
 
 ## Tech Stack
 
