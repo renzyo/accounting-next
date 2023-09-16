@@ -1,6 +1,6 @@
-# Store Management Website
+# Warehouse Management Website
 
-Store Product and Sales Management Website built using Next and Typescript.
+Store Product and Sales Management Website built using Next JS (app directory) and Typescript.
 
 ## Getting Started
 
