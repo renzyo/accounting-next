@@ -1,7 +1,7 @@
 {
   "Login": {
-    "appName": "Store Management",
-    "appDescription": "Manage your store with ease.",
+    "appName": "Warehouse Management",
+    "appDescription": "Manage your store warehouse with ease.",
     "emailPasswordError": "Email or password is incorrect.",
     "login": "Login"
   },

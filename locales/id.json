@@ -1,7 +1,7 @@
 {
   "Login": {
-    "appName": "Manajemen Toko",
-    "appDescription": "Mengelola toko Anda dengan mudah.",
+    "appName": "Manajemen Gudang",
+    "appDescription": "Mengelola gudang toko Anda dengan mudah.",
     "emailPasswordError": "Email atau password salah.",
     "login": "Masuk"
   },

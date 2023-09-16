@@ -69,7 +69,7 @@ export default function Login() {
       >
         <div id="image" className="md:w-1/2 md:h-full">
           <Image
-            src="https://images.unsplash.com/photo-1579621970343-21c491b3f363?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
+            src="https://images.unsplash.com/photo-1553413077-190dd305871c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1935&q=80"
             className="w-full h-64 md:w-full md:h-full object-cover rounded-t-xl md:rounded-tr-none md:rounded-l-xl"
             width={400}
             height={500}
