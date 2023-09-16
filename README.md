@@ -2,6 +2,12 @@
 
 Store Product and Sales Management Website built using Next JS (app directory) and Typescript.
 
+Try the demo [here](https://warehouse.merza.dev/).
+With the following credentials:
+
+- Email: admin@merza.dev
+- Password: admin123
+
 ## Getting Started
 
 1. Clone this repo.
