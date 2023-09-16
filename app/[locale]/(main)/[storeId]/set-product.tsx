@@ -2,10 +2,10 @@
 "use client";
 
 import { useProduct } from "@/hooks/use-product";
-import { Product } from "@prisma/client";
+import { ProductData } from "@/lib/types";
 import { useEffect } from "react";
 
-const SetProduct = ({ products }: { products: Product[] }) => {
+const SetProduct = ({ products }: { products: ProductData[] }) => {
   const productStore = useProduct();
 
   useEffect(() => {
