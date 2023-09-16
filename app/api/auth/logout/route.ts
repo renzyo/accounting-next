@@ -14,6 +14,11 @@ export async function GET() {
       value: "",
       maxAge: -1,
     }),
+    response.cookies.set({
+      name: "userId",
+      value: "",
+      maxAge: -1,
+    }),
   ]);
 
   return response;
