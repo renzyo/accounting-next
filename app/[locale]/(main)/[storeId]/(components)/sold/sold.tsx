@@ -39,7 +39,7 @@ const Sold = () => {
   }
 
   return (
-    <div className="w-full mt-4 p-4 bg-slate-300 rounded-lg">
+    <div className="w-full mt-4 p-4 rounded-lg">
       <Subheading
         icon={<TruckIcon className="w-8 h-8" />}
         title={t("title")}

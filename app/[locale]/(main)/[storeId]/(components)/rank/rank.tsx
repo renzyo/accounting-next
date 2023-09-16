@@ -41,7 +41,7 @@ const Rank = () => {
   }
 
   return (
-    <div className="w-full mt-4 p-4 bg-slate-300 rounded-lg">
+    <div className="w-full mt-4 p-4 rounded-lg">
       <Subheading
         icon={<MedalIcon className="w-8 h-8" />}
         title={t("title")}
@@ -50,7 +50,7 @@ const Rank = () => {
       <div className="mt-8">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="w-full md:w-1/2">
-            <div className="w-full p-4 bg-slate-100 rounded-lg">
+            <div className="w-full p-4 bg-slate-200 rounded-lg">
               <Subheading
                 title={t("5topTitle")}
                 description={t("5topDescription")}
@@ -63,7 +63,7 @@ const Rank = () => {
                   topFive.map((product) => (
                     <li
                       key={product.productId}
-                      className="flex items-center justify-between p-4 bg-slate-100 rounded-lg mb-2"
+                      className="flex items-center justify-between p-4 bg-slate-200 rounded-lg mb-2"
                     >
                       <p className="text-lg font-semibold">
                         {product.productName}
@@ -82,7 +82,7 @@ const Rank = () => {
             </div>
           </div>
           <div className="w-full md:w-1/2">
-            <div className="w-full p-4 bg-slate-100 rounded-lg">
+            <div className="w-full p-4 bg-slate-200 rounded-lg">
               <Subheading
                 title={t("5bottomTitle")}
                 description={t("5bottomDescription")}
@@ -95,7 +95,7 @@ const Rank = () => {
                   bottomFive.map((product) => (
                     <li
                       key={product.productId}
-                      className="flex items-center justify-between p-4 bg-slate-100 rounded-lg mb-2"
+                      className="flex items-center justify-between p-4 bg-slate-200 rounded-lg mb-2"
                     >
                       <p className="text-lg font-semibold">
                         {product.productName}

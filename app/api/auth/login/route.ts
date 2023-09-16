@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
     const user = await prismadb.user.findUnique({
       where: {
-        email: data.email,
+        email: data.email.toLowerCase(),
       },
     });
 

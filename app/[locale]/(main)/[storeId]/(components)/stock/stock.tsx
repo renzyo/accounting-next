@@ -40,7 +40,7 @@ const Stock = () => {
   }
 
   return (
-    <div className="w-full mt-4 p-4 bg-slate-300 rounded-lg">
+    <div className="w-full mt-4 p-4 rounded-lg">
       <Subheading
         icon={<PackageXIcon className="w-8 h-8" />}
         title={t("title")}
