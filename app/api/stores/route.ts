@@ -2,6 +2,33 @@ import { GlobalError, SuccessResponse, UnauthorizedError } from "@/lib/helper";
 import prismadb from "@/lib/prisma";
 import { NextRequest } from "next/server";
 
+export async function GET(req: NextRequest) {
+  try {
+    const userId = req.cookies.get("userId")?.value;
+
+    const user = await prismadb.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!userId) {
+      return UnauthorizedError({
+        message: "You are not authorized to access this resource.",
+      });
+    }
+
+    const stores = await prismadb.store.findFirst();
+
+    return SuccessResponse({
+      store: {
+        id: stores?.id,
+        name: stores?.name,
+      },
+    });
+  } catch (error) {}
+}
+
 export async function POST(req: NextRequest) {
   try {
     const userId = req.cookies.get("userId")?.value;

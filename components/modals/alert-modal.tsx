@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface AlertModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
   onConfirm,
   loading,
 }) => {
+  const t = useTranslations("DeleteModal");
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -30,17 +32,17 @@ export const AlertModal: React.FC<AlertModalProps> = ({
 
   return (
     <Modal
-      title="Apakah kamu yakin?"
-      description="Aksi ini tidak bisa dibatalkan. Pastikan kamu yakin sebelum melanjutkan."
+      title={t("title")}
+      description={t("description")}
       isOpen={isOpen}
       onClose={onClose}
     >
       <div className="pt-6 space-x-2 flex items-center justify-end w-full">
         <Button disabled={loading} variant="outline" onClick={onClose}>
-          Cancel
+          {t("cancelButton")}
         </Button>
         <Button disabled={loading} variant="destructive" onClick={onConfirm}>
-          Continue
+          {t("confirmButton")}
         </Button>
       </div>
     </Modal>

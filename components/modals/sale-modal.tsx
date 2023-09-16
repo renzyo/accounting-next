@@ -40,18 +40,22 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "../ui/calendar";
 import { ProductData } from "@/lib/types";
+import { useTranslations } from "next-intl";
 
 const formSchema = z.object({
   id: z.string().min(1),
   merchantId: z.string().min(1),
   productId: z.string().min(1),
   saleDate: z.date({
-    required_error: "Tanggal penjualan harus diisi.",
+    required_error: "Date is required",
   }),
   quantity: z.string().min(1),
 });
 
 export const SaleModal = () => {
+  const tProducts = useTranslations("Products");
+  const t = useTranslations("Sales");
+
   const saleModalStore = useSaleModal();
   const productListStore = useProduct();
   const merchantListStore = useMerchantList();
@@ -70,7 +74,7 @@ export const SaleModal = () => {
         setProducts(products);
       } catch (error) {
         console.log(error);
-        toast.error("Gagal memuat produk");
+        toast.error(tProducts("loadProductFailed"));
       } finally {
         setLoading(false);
       }
@@ -80,7 +84,7 @@ export const SaleModal = () => {
       productListStore.setProductUpdated(false);
     }
     getProducts();
-  }, [params.storeId, productListStore]);
+  }, [params.storeId, productListStore, tProducts]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -124,14 +128,14 @@ export const SaleModal = () => {
             previousQuantity: parseInt(saleModalStore.saleData?.quantity!),
           }
         );
-        toast.success("Penjualan berhasil diperbaharui");
+        toast.success(t("updateSaleSuccess"));
         saleModalStore.setIsEditing(false);
       } else {
         await axios.post(`/api/${params.storeId}/sales`, {
           ...sale,
           type: "single",
         });
-        toast.success("Penjualan berhasil ditambahkan");
+        toast.success(t("addSaleSuccess"));
       }
 
       form.reset();
@@ -139,9 +143,8 @@ export const SaleModal = () => {
       saleModalStore.setSaleUpdated(true);
       saleModalStore.onClose();
     } catch (error) {
-      toast.error(
-        "Tidak dapat menambahkan penjualan. Pastikan stok produk mencukupi."
-      );
+      console.log(error);
+      toast.error(t("saleError"));
     } finally {
       setLoading(false);
     }
@@ -150,12 +153,12 @@ export const SaleModal = () => {
   return (
     <Modal
       title={
-        saleModalStore.isEditing ? "Perbaharui Penjualan" : "Tambah Penjualan"
+        saleModalStore.isEditing ? t("updateSaleTitle") : t("addSaleTitle")
       }
       description={
         saleModalStore.isEditing
-          ? "Perbaharui penjualan yang sudah ada."
-          : "Tambahkan penjualan baru ke toko."
+          ? t("updateSaleDescription")
+          : t("addSaleDescription")
       }
       isOpen={saleModalStore.isOpen}
       onClose={() => {
@@ -177,7 +180,7 @@ export const SaleModal = () => {
                   defaultValue={saleModalStore.saleData?.merchantId}
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Merchant</FormLabel>
+                      <FormLabel>{t("merchant")}</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -185,7 +188,9 @@ export const SaleModal = () => {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Pilih Merchant..." />
+                            <SelectValue
+                              placeholder={t("merchantPlaceholder")}
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -193,7 +198,7 @@ export const SaleModal = () => {
                             <SelectItem
                               value={merchant.id}
                               key={merchant.id}
-                              placeholder="Pilih Merchant..."
+                              placeholder={t("merchantPlaceholder")}
                             >
                               {merchant.name}
                             </SelectItem>
@@ -209,7 +214,7 @@ export const SaleModal = () => {
                           merchantListStore.onOpen();
                         }}
                       >
-                        Kelola Merchant
+                        {t("manageMerchantButton")}
                       </Button>
                     </FormItem>
                   )}
@@ -219,7 +224,7 @@ export const SaleModal = () => {
                   name="productId"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Produk</FormLabel>
+                      <FormLabel>{t("product")}</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -227,19 +232,21 @@ export const SaleModal = () => {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Pilih Produk..." />
+                            <SelectValue
+                              placeholder={t("productPlaceholder")}
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           <ScrollArea className="min-h-[50px]">
                             {products.length === 0 ? (
-                              <p>Belum ada produk</p>
+                              <p>{t("noProduct")}</p>
                             ) : (
                               products.map((product) => (
                                 <SelectItem
                                   value={product.id}
                                   key={product.id}
-                                  placeholder="Pilih produk..."
+                                  placeholder={t("productPlaceholder")}
                                 >
                                   {product.name}
                                 </SelectItem>
@@ -257,7 +264,7 @@ export const SaleModal = () => {
                   name="saleDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tanggal Penjualan</FormLabel>
+                      <FormLabel>{t("saleDate")}</FormLabel>
                       <FormControl>
                         <div className="block">
                           <Popover>
@@ -274,7 +281,7 @@ export const SaleModal = () => {
                                 {field.value ? (
                                   format(new Date(field.value), "PPP")
                                 ) : (
-                                  <span>Pick a date</span>
+                                  <span>{t("saleDatePlaceholder")}</span>
                                 )}
                               </Button>
                             </PopoverTrigger>
@@ -304,11 +311,11 @@ export const SaleModal = () => {
                   name="quantity"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Unit Terjual</FormLabel>
+                      <FormLabel>{t("quantity")}</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="Unit Terjual"
+                          placeholder={t("quantityPlaceholder")}
                           type="number"
                           {...field}
                         />
@@ -329,7 +336,7 @@ export const SaleModal = () => {
                       saleModalStore.onClose();
                     }}
                   >
-                    Cancel
+                    {t("cancelButton")}
                   </Button>
                   <Button
                     disabled={loading}
@@ -339,8 +346,8 @@ export const SaleModal = () => {
                     }}
                   >
                     {saleModalStore.isEditing
-                      ? "Perbaharui Penjualan"
-                      : "Tambahkan Penjualan"}
+                      ? t("updateSaleButton")
+                      : t("addSaleButton")}
                   </Button>
                 </div>
               </form>

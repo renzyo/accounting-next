@@ -21,12 +21,15 @@ import { Button } from "@/components/ui/button";
 import { useAddMerchantModal } from "@/hooks/use-add-merchant-modal";
 import { useParams, useRouter } from "next/navigation";
 import { useMerchantList } from "@/hooks/use-merchant-list-modal";
+import { useTranslations } from "next-intl";
 
 const formSchema = z.object({
   name: z.string().min(1),
 });
 
 export const AddMerchantModal = () => {
+  const t = useTranslations("Merchant");
+
   const addMerchantModal = useAddMerchantModal();
   const merchantListStore = useMerchantList();
   const params = useParams();
@@ -86,16 +89,16 @@ export const AddMerchantModal = () => {
       }
 
       if (addMerchantModal.isEditing) {
-        toast.success("Merchant updated successfully");
+        toast.success(t("updateMerchantSuccess"));
       } else {
-        toast.success("Merchant created successfully");
+        toast.success(t("addMerchantSuccess"));
       }
       form.reset();
       addMerchantModal.setIsEditing(false);
       addMerchantModal.onClose();
       router.refresh();
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error(t("merchantError"));
     } finally {
       setLoading(false);
     }
@@ -104,15 +107,21 @@ export const AddMerchantModal = () => {
   return (
     <Modal
       title={
-        addMerchantModal.isEditing ? "Perbaharui Merchant" : "Merchant Baru"
+        addMerchantModal.isEditing
+          ? t("updateMerchantTitle")
+          : t("addMerchantTitle")
       }
       description={
         addMerchantModal.isEditing
-          ? "Perbaharui Merchant"
-          : "Tambah Merchant Baru"
+          ? t("updateMerchantDescription")
+          : t("addMerchantDescription")
       }
       isOpen={addMerchantModal.isOpen}
-      onClose={addMerchantModal.onClose}
+      onClose={() => {
+        form.reset();
+        addMerchantModal.setIsEditing(false);
+        addMerchantModal.onClose();
+      }}
     >
       <div>
         <div className="space-y-4 py-2 pb-4">
@@ -124,11 +133,11 @@ export const AddMerchantModal = () => {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nama Merchant</FormLabel>
+                      <FormLabel>{t("merchantName")}</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="Nama Merchant"
+                          placeholder={t("merchantNamePlaceholder")}
                           {...field}
                         />
                       </FormControl>
@@ -146,8 +155,8 @@ export const AddMerchantModal = () => {
                   </Button>
                   <Button disabled={loading} type="submit">
                     {addMerchantModal.isEditing
-                      ? "Perbaharui Merchant"
-                      : "Tambahkan Merchant"}
+                      ? t("updateMerchantButton")
+                      : t("addMerchantButton")}
                   </Button>
                 </div>
               </form>

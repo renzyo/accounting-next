@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyJWT } from "./lib/token";
 import { GlobalError, UnauthorizedError } from "./lib/helper";
+import createMiddleware from "next-intl/middleware";
 
 interface AuthenticatedRequest extends NextRequest {
   user: {
@@ -8,9 +9,21 @@ interface AuthenticatedRequest extends NextRequest {
   };
 }
 
+export default createMiddleware({
+  // A list of all locales that are supported
+  locales: ["en", "id"],
+
+  // If this locale is matched, pathnames work without a prefix (e.g. `/about`)
+  defaultLocale: "en",
+});
+
 let redirectToLogin = false;
 export async function middleware(req: NextRequest) {
   let token: string | undefined;
+
+  if (req.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/en", req.url));
+  }
 
   if (req.cookies.has("token")) {
     token = req.cookies.get("token")?.value;
@@ -18,7 +31,7 @@ export async function middleware(req: NextRequest) {
     token = req.headers.get("Authorization")?.replace("Bearer ", "");
   }
 
-  if (req.nextUrl.pathname.startsWith("/login") && (!token || redirectToLogin))
+  if (req.nextUrl.pathname.includes("/login") && (!token || redirectToLogin))
     return;
 
   if (
@@ -43,32 +56,28 @@ export async function middleware(req: NextRequest) {
       return GlobalError({ message: error.message });
     }
 
-    return NextResponse.redirect(
-      new URL(`/login?${new URLSearchParams({ error: "badauth" })}`, req.url)
-    );
+    return NextResponse.redirect(new URL(`/en/login`, req.url));
   }
 
   const authUser = (req as AuthenticatedRequest).user;
 
   if (!authUser) {
-    return NextResponse.redirect(
-      new URL(
-        `/login?${new URLSearchParams({
-          error: "badauth",
-          forceLogin: "true",
-        })}`,
-        req.url
-      )
-    );
+    return NextResponse.redirect(new URL(`/en/login`, req.url));
   }
 
   if (req.url.includes("/login") && authUser) {
-    return NextResponse.redirect(new URL("/", req.url));
+    return NextResponse.redirect(new URL("/en", req.url));
   }
 
   return response;
 }
 
 export const config = {
-  matcher: ["/", "/login", "/api/users/:path*", "/api/auth/logout"],
+  matcher: [
+    "/",
+    "/login",
+    "/api/users/:path*",
+    "/api/auth/logout",
+    "/((?!api|_next|.*\\..*).*)",
+  ],
 };

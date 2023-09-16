@@ -9,12 +9,15 @@ import {
 } from "./ui/dropdown-menu";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 
 interface DropdownContentProps {
   name: string;
 }
 
 export default function DropdownContent({ name }: DropdownContentProps) {
+  const t = useTranslations("ManageUser");
+  const lang = useLocale();
   const params = useParams();
   const router = useRouter();
 
@@ -37,17 +40,17 @@ export default function DropdownContent({ name }: DropdownContentProps) {
       <DropdownMenuSeparator />
       <DropdownMenuItem
         onClick={() => {
-          router.push(`/${params.storeId}/profile`);
+          router.push(`/${lang}/${params.storeId}/profile`);
         }}
       >
-        Profil Saya
+        {t("profileButton")}
       </DropdownMenuItem>
       <DropdownMenuItem
         onClick={() => {
-          router.push(`/${params.storeId}/manage-user`);
+          router.push(`/${lang}/${params.storeId}/manage-user`);
         }}
       >
-        Kelola User
+        {t("manageUserButton")}
       </DropdownMenuItem>
       <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
     </DropdownMenuContent>

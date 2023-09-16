@@ -4,6 +4,11 @@ export interface UserData {
   role: string;
 }
 
+export interface StoreData {
+  id: string;
+  name: string;
+}
+
 export interface ProductData {
   id: string;
   imageId: string;

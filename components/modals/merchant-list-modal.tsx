@@ -9,15 +9,17 @@ import { Edit2Icon } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { DeleteMerchantButton } from "../delete-merchant-button";
 import { Fragment } from "react";
+import { useTranslations } from "next-intl";
 
 export const MerchantListModal = () => {
+  const t = useTranslations("Merchant");
   const merchantListStore = useMerchantList();
   const addMerchantModal = useAddMerchantModal();
 
   return (
     <Modal
-      title="List Merchant"
-      description="List Merchant"
+      title={t("merchantListTitle")}
+      description={t("merchantListDescription")}
       isOpen={merchantListStore.isOpen}
       onClose={() => {
         merchantListStore.onClose();
@@ -65,7 +67,7 @@ export const MerchantListModal = () => {
                 addMerchantModal.onOpen();
               }}
             >
-              Tambah Merchant
+              {t("addMerchantButton")}
             </Button>
           </div>
         </div>

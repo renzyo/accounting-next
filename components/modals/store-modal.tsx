@@ -22,12 +22,14 @@ import { useAddStoreModal } from "@/hooks/use-add-store-modal";
 import { useStoreList } from "@/hooks/use-store-list-modal";
 import { Store } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const formSchema = z.object({
   name: z.string().min(1),
 });
 
 export const StoreModal = () => {
+  const t = useTranslations("Store");
   const router = useRouter();
   const storeList = useStoreList();
   const storeModalStore = useAddStoreModal();
@@ -53,7 +55,7 @@ export const StoreModal = () => {
 
       if (storeModalStore.isEditing) {
         await axios.put(`/api/stores/${storeModalStore.storeData?.id}`, values);
-        toast.success("Store updated successfully");
+        toast.success(t("updateStoreSuccess"));
 
         const oldStoreList = storeList.storeList ?? [];
         const updatedStore = oldStoreList.find(
@@ -78,14 +80,14 @@ export const StoreModal = () => {
 
         storeList.setStoreList(oldStoreList.concat(response.data as Store));
 
-        toast.success("Store created successfully");
+        toast.success(t("addStoreSuccess"));
         form.reset();
         storeModalStore.setIsEditing(false);
         storeModalStore.onClose();
         window.location.assign(`/${response.data.id}`);
       }
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error(t("storeError"));
     } finally {
       setLoading(false);
     }
@@ -93,8 +95,14 @@ export const StoreModal = () => {
 
   return (
     <Modal
-      title="Buat toko baru"
-      description="Buat toko baru untuk manajemen penjualan barang"
+      title={
+        storeModalStore.isEditing ? t("updateStoreTitle") : t("addStoreTitle")
+      }
+      description={
+        storeModalStore.isEditing
+          ? t("updateStoreDescription")
+          : t("addStoreDescription")
+      }
       isOpen={storeModalStore.isOpen}
       onClose={storeModalStore.onClose}
     >
@@ -108,11 +116,11 @@ export const StoreModal = () => {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nama Toko</FormLabel>
+                      <FormLabel>{t("storeName")}</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="Toko Baru"
+                          placeholder={t("storeNamePlaceholder")}
                           {...field}
                         />
                       </FormControl>
@@ -126,10 +134,12 @@ export const StoreModal = () => {
                     variant="outline"
                     onClick={storeModalStore.onClose}
                   >
-                    Cancel
+                    {t("cancelButton")}
                   </Button>
                   <Button disabled={loading} type="submit">
-                    Buat Toko
+                    {storeModalStore.isEditing
+                      ? t("updateStoreButton")
+                      : t("addStoreButton")}
                   </Button>
                 </div>
               </form>

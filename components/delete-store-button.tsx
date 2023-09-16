@@ -9,6 +9,7 @@ import { toast } from "react-hot-toast";
 import { AlertModal } from "@/components/modals/alert-modal";
 import { Button } from "@/components/ui/button";
 import { useStoreList } from "@/hooks/use-store-list-modal";
+import { useTranslations } from "next-intl";
 
 interface DeleteStoreButtonProps {
   key: string;
@@ -19,6 +20,7 @@ export const DeleteStoreButton: FC<DeleteStoreButtonProps> = ({
   key,
   storeId,
 }) => {
+  const t = useTranslations("Store");
   const storeListStore = useStoreList();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -35,13 +37,11 @@ export const DeleteStoreButton: FC<DeleteStoreButtonProps> = ({
 
       storeListStore.setStoreList(newStoreList);
 
-      toast.success("Toko berhasil dihapus.");
+      toast.success(t("deleteStoreSuccess"));
 
       router.push("/");
     } catch (error) {
-      toast.error(
-        "Gagal menghapus toko, pastikan bahwa tidak ada penjualan dan produk pada toko ini."
-      );
+      toast.error(t("deleteStoreError"));
     } finally {
       setLoading(false);
       setOpen(false);

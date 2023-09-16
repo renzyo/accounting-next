@@ -9,15 +9,17 @@ import { Fragment } from "react";
 import { useStoreList } from "@/hooks/use-store-list-modal";
 import { useAddStoreModal } from "@/hooks/use-add-store-modal";
 import { DeleteStoreButton } from "../delete-store-button";
+import { useTranslations } from "next-intl";
 
 export const StoreListModal = () => {
+  const t = useTranslations("Store");
   const storeListStore = useStoreList();
   const addStoreModal = useAddStoreModal();
 
   return (
     <Modal
-      title="List Toko"
-      description="List Toko"
+      title={t("storeListTitle")}
+      description={t("storeListDescription")}
       isOpen={storeListStore.isOpen}
       onClose={() => {
         storeListStore.onClose();
@@ -62,7 +64,7 @@ export const StoreListModal = () => {
                 addStoreModal.onOpen();
               }}
             >
-              Tambah Toko
+              {t("addStoreButton")}
             </Button>
           </div>
         </div>

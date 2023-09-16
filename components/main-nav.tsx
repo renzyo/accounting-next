@@ -4,28 +4,31 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
 
 export function MainNav({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
+  const t = useTranslations("Navigation");
+  const locale = useLocale();
   const pathname = usePathname();
   const params = useParams();
 
   const routes = [
     {
-      href: `/${params.storeId}`,
-      label: "Dashboard",
+      href: `/${locale}/${params.storeId}`,
+      label: t("dashboard"),
       active: pathname === `/${params.storeId}`,
     },
     {
-      href: `/${params.storeId}/products`,
-      label: "Produk",
+      href: `/${locale}/${params.storeId}/products`,
+      label: t("products"),
       active: pathname === `/${params.storeId}/products`,
     },
     {
-      href: `/${params.storeId}/sales`,
-      label: "Penjualan",
+      href: `/${locale}/${params.storeId}/sales`,
+      label: t("sales"),
       active: pathname === `/${params.storeId}/sales`,
     },
   ];

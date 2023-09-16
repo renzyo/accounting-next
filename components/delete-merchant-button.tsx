@@ -9,6 +9,7 @@ import { toast } from "react-hot-toast";
 import { AlertModal } from "@/components/modals/alert-modal";
 import { Button } from "@/components/ui/button";
 import { useMerchantList } from "@/hooks/use-merchant-list-modal";
+import { useTranslations } from "next-intl";
 
 interface deleteMerchantButtonProps {
   key: string;
@@ -19,6 +20,7 @@ export const DeleteMerchantButton: FC<deleteMerchantButtonProps> = ({
   key,
   merchantId,
 }) => {
+  const t = useTranslations("Merchant");
   const merchantListStore = useMerchantList();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -37,12 +39,10 @@ export const DeleteMerchantButton: FC<deleteMerchantButtonProps> = ({
 
       merchantListStore.setMerchantList(newMerchantList);
 
-      toast.success("Merchant berhasil dihapus.");
+      toast.success(t("deleteMerchantSuccess"));
       router.refresh();
     } catch (error) {
-      toast.error(
-        "Gagal menghapus merchant, pastikan bahwa tidak ada penjualan yang menggunakan merchant ini."
-      );
+      toast.error(t("deleteMerchantError"));
     } finally {
       setLoading(false);
       setOpen(false);

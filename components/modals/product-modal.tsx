@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { useProductModal } from "@/hooks/use-product-modal";
 import { useParams, useRouter } from "next/navigation";
 import { useProduct } from "@/hooks/use-product";
+import { useTranslations } from "next-intl";
 
 const formSchema = z.object({
   id: z.string().min(1),
@@ -31,6 +32,7 @@ const formSchema = z.object({
 });
 
 export const ProductModal = () => {
+  const t = useTranslations("Products");
   const productStore = useProductModal();
   const productListStore = useProduct();
   const params = useParams();
@@ -96,7 +98,7 @@ export const ProductModal = () => {
           }
         );
 
-        toast.success("Produk berhasil diperbaharui");
+        toast.success(t("updateProductSuccess"));
         productStore.setIsEditing(false);
       } else {
         formData.append("type", "single");
@@ -107,7 +109,7 @@ export const ProductModal = () => {
           },
         });
 
-        toast.success("Produk berhasil ditambahkan");
+        toast.success(t("addProductSuccess"));
       }
 
       router.refresh();
@@ -116,7 +118,7 @@ export const ProductModal = () => {
       productListStore.setProductUpdated(true);
       productStore.onClose();
     } catch (error) {
-      toast.error("Terjadi kesalahan pada server.");
+      toast.error(t("productError"));
     } finally {
       setLoading(false);
     }
@@ -124,11 +126,13 @@ export const ProductModal = () => {
 
   return (
     <Modal
-      title={productStore.isEditing ? "Edit Produk" : "Tambah Produk"}
+      title={
+        productStore.isEditing ? t("updateProductTitle") : t("addProductTitle")
+      }
       description={
         productStore.isEditing
-          ? "Perbaharui produk yang sudah ada."
-          : "Tambahkan produk baru ke toko."
+          ? t("updateProductDescription")
+          : t("addProductDescription")
       }
       isOpen={productStore.isOpen}
       onClose={() => {
@@ -150,11 +154,11 @@ export const ProductModal = () => {
                   defaultValue={productStore.productData?.name}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nama Produk</FormLabel>
+                      <FormLabel>{t("productName")}</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="Nama Produk"
+                          placeholder={t("productNamePlaceholder")}
                           {...field}
                         />
                       </FormControl>
@@ -163,14 +167,14 @@ export const ProductModal = () => {
                   )}
                 />
                 <FormItem>
-                  <FormLabel>Gambar Produk</FormLabel>
+                  <FormLabel>{t("productImage")}</FormLabel>
                   <FormControl>
                     <Input
                       name="image"
                       type="file"
                       accept="image/*"
                       disabled={loading}
-                      placeholder="Gambar Produk"
+                      placeholder={t("productImagePlaceholder")}
                       onChange={(event: any) => {
                         setFile(event.target.files?.[0] ?? null);
                       }}
@@ -183,11 +187,11 @@ export const ProductModal = () => {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Deskripsi Produk</FormLabel>
+                      <FormLabel>{t("productDescription")}</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="Deskripsi Produk"
+                          placeholder={t("productDescriptionPlaceholder")}
                           {...field}
                         />
                       </FormControl>
@@ -200,11 +204,11 @@ export const ProductModal = () => {
                   name="stockThreshold"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Batas Stok</FormLabel>
+                      <FormLabel>{t("productStockThreshold")}</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="Batas Stok"
+                          placeholder={t("productStockThresholdPlaceholder")}
                           type="number"
                           {...field}
                         />
@@ -218,11 +222,11 @@ export const ProductModal = () => {
                   name="stock"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Stok</FormLabel>
+                      <FormLabel>{t("productStock")}</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="Stok"
+                          placeholder={t("productStockPlaceholder")}
                           type="number"
                           {...field}
                         />
@@ -243,7 +247,7 @@ export const ProductModal = () => {
                       productStore.onClose();
                     }}
                   >
-                    Cancel
+                    {t("cancelButton")}
                   </Button>
                   <Button
                     disabled={loading}
@@ -253,8 +257,8 @@ export const ProductModal = () => {
                     }}
                   >
                     {productStore.isEditing
-                      ? "Perbaharui Produk"
-                      : "Tambahkan Produk"}
+                      ? t("updateProductButton")
+                      : t("addProductButton")}
                   </Button>
                 </div>
               </form>

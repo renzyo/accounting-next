@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { Store, User } from "@prisma/client";
 import { useAddStoreModal } from "@/hooks/use-add-store-modal";
 import { useStoreList } from "@/hooks/use-store-list-modal";
+import { useTranslations } from "next-intl";
 
 type PopoverTriggerProps = React.ComponentPropsWithoutRef<
   typeof PopoverTrigger
@@ -35,6 +36,7 @@ interface StoreSwitcherProps extends PopoverTriggerProps {
 }
 
 const StoreSwitcher: FC<StoreSwitcherProps> = ({ className, items, user }) => {
+  const t = useTranslations("Store");
   const storeModal = useAddStoreModal();
   const storeList = useStoreList();
   const params = useParams();
@@ -76,7 +78,7 @@ const StoreSwitcher: FC<StoreSwitcherProps> = ({ className, items, user }) => {
         <Command>
           <CommandList>
             <CommandInput placeholder="Cari toko..." />
-            <CommandEmpty>Toko tidak ditemukan.</CommandEmpty>
+            <CommandEmpty>{t("notFound")}</CommandEmpty>
             <CommandGroup heading="Pilih Toko">
               {formattedItems.map((store) => (
                 <CommandItem
@@ -110,7 +112,7 @@ const StoreSwitcher: FC<StoreSwitcherProps> = ({ className, items, user }) => {
                     }}
                   >
                     <SettingsIcon className="mr-2 h-5 w-5" />
-                    Kelola Toko
+                    {t("manageStoreButton")}
                   </CommandItem>
                   <CommandItem
                     onSelect={() => {
@@ -119,7 +121,7 @@ const StoreSwitcher: FC<StoreSwitcherProps> = ({ className, items, user }) => {
                     }}
                   >
                     <PlusCircle className="mr-2 h-5 w-5" />
-                    Tambah Toko
+                    {t("addStoreButton")}
                   </CommandItem>
                 </CommandGroup>
               </CommandList>

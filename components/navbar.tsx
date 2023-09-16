@@ -3,6 +3,7 @@ import { MainNav } from "./main-nav";
 import StoreSwitcher from "./store-switcher";
 import UserButton from "./user-button";
 import { cookies } from "next/headers";
+import LocaleSwitcher from "./locale-switcher";
 
 export const Navbar = async () => {
   const userId = cookies().get("userId")?.value;
@@ -21,6 +22,7 @@ export const Navbar = async () => {
         <StoreSwitcher items={stores} user={user!} />
         <MainNav className="mx-6" />
         <div className="ml-auto flex items-center space-x-4">
+          <LocaleSwitcher />
           <UserButton />
         </div>
       </div>

@@ -7,6 +7,7 @@ import { toast } from "react-hot-toast";
 
 import { AlertModal } from "@/components/modals/alert-modal";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface DeleteUserButtonProps {
   key: string;
@@ -19,6 +20,7 @@ export const DeleteUserButton: FC<DeleteUserButtonProps> = ({
   userId,
   setUsers,
 }) => {
+  const t = useTranslations("ManageUser");
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -27,10 +29,10 @@ export const DeleteUserButton: FC<DeleteUserButtonProps> = ({
       setLoading(true);
       const response = await axios.delete(`/api/auth/users/${userId}`);
 
-      toast.success("User berhasil dihapus.");
+      toast.success(t("deleteUserSuccess"));
       setUsers(response.data?.users);
     } catch (error) {
-      toast.error("Gagal menghapus user.");
+      toast.error(t("deleteUserError"));
     } finally {
       setLoading(false);
       setOpen(false);

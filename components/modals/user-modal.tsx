@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation";
 import { useUserModal } from "@/hooks/use-user-modal";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
+import { useTranslations } from "next-intl";
 
 const roleOption = [
   {
@@ -61,6 +62,7 @@ const userPasswordFormSchema = z.object({
 });
 
 export const UserModal = () => {
+  const t = useTranslations("ManageUser");
   const router = useRouter();
   const userStore = useUserModal();
 
@@ -113,7 +115,7 @@ export const UserModal = () => {
 
       if (updatePassword) {
         if (passwordValues.password !== passwordValues.confirmPassword) {
-          toast.error("Password tidak sama");
+          toast.error(t("passwordNotMatch"));
           return;
         }
       }
@@ -130,7 +132,7 @@ export const UserModal = () => {
         }
       );
 
-      toast.success("User updated successfully");
+      toast.success(t("updateUserSuccess"));
 
       userProfileForm.reset();
       setUpdatePassword(false);
@@ -139,7 +141,7 @@ export const UserModal = () => {
       userStore.onClose();
       router.refresh();
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error(t("updateUserFailed"));
     } finally {
       setLoading(false);
     }
@@ -147,10 +149,15 @@ export const UserModal = () => {
 
   return (
     <Modal
-      title="Perbaharui Data User"
-      description="Perbaharui data user yang sudah ada."
+      title={t("updateUserTitle")}
+      description={t("updateUserDescription")}
       isOpen={userStore.isOpen}
-      onClose={userStore.onClose}
+      onClose={() => {
+        userProfileForm.reset();
+        setUpdatePassword(false);
+        userStore.setIsEditing(false);
+        userStore.onClose();
+      }}
     >
       <div>
         <div className="space-y-4 py-2 pb-4">
@@ -162,11 +169,11 @@ export const UserModal = () => {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nama User</FormLabel>
+                      <FormLabel>{t("userName")}</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="Masukkan nama user"
+                          placeholder={t("userNamePlaceholder")}
                           {...field}
                         />
                       </FormControl>
@@ -179,11 +186,11 @@ export const UserModal = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email User</FormLabel>
+                      <FormLabel>{t("userEmail")}</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="Masukkan email user"
+                          placeholder={t("userEmailPlaceholder")}
                           {...field}
                         />
                       </FormControl>
@@ -196,14 +203,16 @@ export const UserModal = () => {
                   name="role"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Role User</FormLabel>
+                      <FormLabel>{t("userRole")}</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Pilih Merchant..." />
+                            <SelectValue
+                              placeholder={t("userRolePlaceholder")}
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -211,7 +220,7 @@ export const UserModal = () => {
                             <SelectItem
                               value={role.value}
                               key={role.value}
-                              placeholder="Pilih Merchant..."
+                              placeholder={t("userRolePlaceholder")}
                             >
                               {role.label}
                             </SelectItem>
@@ -230,7 +239,7 @@ export const UserModal = () => {
                 checked={updatePassword}
                 onCheckedChange={setUpdatePassword}
               />
-              <Label htmlFor="usePassword">Ubah password user</Label>
+              <Label htmlFor="usePassword">{t("updateUserPassword")}</Label>
             </div>
             {updatePassword && (
               <Form {...userPasswordForm}>
@@ -240,11 +249,11 @@ export const UserModal = () => {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password Baru</FormLabel>
+                        <FormLabel>{t("newPassword")}</FormLabel>
                         <FormControl>
                           <Input
                             disabled={loading}
-                            placeholder="Masukkan password baru"
+                            placeholder={t("newPasswordPlaceholder")}
                             {...field}
                           />
                         </FormControl>
@@ -257,11 +266,13 @@ export const UserModal = () => {
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Konfirmasi Password Baru</FormLabel>
+                        <FormLabel>{t("newPasswordConfirmation")}</FormLabel>
                         <FormControl>
                           <Input
                             disabled={loading}
-                            placeholder="Konfirmasi password baru"
+                            placeholder={t(
+                              "newPasswordConfirmationPlaceholder"
+                            )}
                             {...field}
                           />
                         </FormControl>
@@ -278,7 +289,7 @@ export const UserModal = () => {
                 variant="outline"
                 onClick={userStore.onClose}
               >
-                Cancel
+                {t("cancelButton")}
               </Button>
               <Button
                 disabled={loading}
@@ -290,7 +301,7 @@ export const UserModal = () => {
                   );
                 }}
               >
-                Perbaharui User
+                {t("updateUserButton")}
               </Button>
             </div>
           </div>
