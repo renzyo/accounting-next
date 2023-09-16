@@ -9,6 +9,7 @@ import { ModalProvider } from "@/providers/modal-provider";
 import SetStore from "./set-store";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { ProductData } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: appName,
@@ -36,11 +37,11 @@ const RootLayout = async ({
 
   const stores = await prismadb.store.findMany();
 
-  const products = await prismadb.product.findMany({
+  const products = (await prismadb.product.findMany({
     where: {
       storeId: params.storeId,
     },
-  });
+  })) as ProductData[];
 
   const merchants = await prismadb.merchant.findMany();
 
@@ -57,4 +58,3 @@ const RootLayout = async ({
 };
 
 export default RootLayout;
-
