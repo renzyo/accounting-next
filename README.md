@@ -5,8 +5,12 @@ Store Product and Sales Management Website built using Next and Typescript.
 ## Getting Started
 
 1. Clone this repo.
+1. Duplicate ```.env.example``` and rename it to ```.env```.
+1. Fill in all the environment variables.
 1. Run ```npm install``` to install all dependencies.
 1. Run ```npm run dev``` to start the development server.
+1. Register a new account.
+1. Open ```http://localhost:3000``` in your browser.
 
 ## Tech Stack
 

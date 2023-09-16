@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
           name: data.name,
           email: data.email,
           password: hashedPassword,
+          role: "ADMIN",
         },
       });
 
