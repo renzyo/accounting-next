@@ -125,7 +125,7 @@ export const UserModal = () => {
         {
           id: userStore.userData?.id,
           name: profileValues.name,
-          email: profileValues.email,
+          email: profileValues.email.toLowerCase(),
           role: profileValues.role,
           updatePassword: updatePassword,
           password: passwordValues.password,

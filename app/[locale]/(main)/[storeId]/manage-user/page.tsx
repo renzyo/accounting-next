@@ -151,7 +151,7 @@ const ManageUser = () => {
 
       const user = {
         name: values.name,
-        email: values.email,
+        email: values.email.toLowerCase(),
         role: values.role,
         password: values.password,
         confirmPassword: values.confirmPassword,
