@@ -39,6 +39,9 @@ const Profile = () => {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [loadingPassword, setLoadingPassword] = useState(false);
+
   const [profile, setProfile] = useState<z.infer<typeof profileFormSchema>>({
     name: "",
     email: "",
@@ -85,6 +88,8 @@ const Profile = () => {
     values: z.infer<typeof profileFormSchema>
   ) {
     try {
+      setLoadingProfile(true);
+
       const response = await axios.put("/api/auth/profile", {
         name: values.name,
         email: values.email,
@@ -103,6 +108,8 @@ const Profile = () => {
     } catch (error) {
       console.log(error);
       toast.error(t("profileUpdateFailed"));
+    } finally {
+      setLoadingProfile(false);
     }
   }
 
@@ -110,6 +117,8 @@ const Profile = () => {
     values: z.infer<typeof passwordFormSchema>
   ) {
     try {
+      setLoadingPassword(true);
+
       if (values.password !== values.confirmPassword) {
         toast.error(t("passwordNotMatch"));
         return;
@@ -130,6 +139,8 @@ const Profile = () => {
       console.log(error);
       toast.error(error.response.data.message);
       toast.error(t("passwordUpdateFailed"));
+    } finally {
+      setLoadingPassword(false);
     }
   }
 
@@ -164,7 +175,11 @@ const Profile = () => {
                     <FormItem>
                       <FormLabel>{t("name")}</FormLabel>
                       <FormControl>
-                        <Input placeholder={t("namePlaceholder")} {...field} />
+                        <Input
+                          placeholder={t("namePlaceholder")}
+                          disabled={loadingProfile}
+                          {...field}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -179,13 +194,18 @@ const Profile = () => {
                         <Input
                           type="email"
                           placeholder={t("emailPlaceholder")}
+                          disabled={loadingProfile}
                           {...field}
                         />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loadingProfile}
+                >
                   {t("saveChangesButton")}
                 </Button>
               </form>
@@ -212,6 +232,7 @@ const Profile = () => {
                       <FormControl>
                         <Input
                           placeholder={t("oldPasswordPlaceholder")}
+                          disabled={loadingPassword}
                           type="password"
                           {...field}
                         />
@@ -228,6 +249,7 @@ const Profile = () => {
                       <FormControl>
                         <Input
                           placeholder={t("newPasswordPlaceholder")}
+                          disabled={loadingPassword}
                           type="password"
                           {...field}
                         />
@@ -244,6 +266,7 @@ const Profile = () => {
                       <FormControl>
                         <Input
                           placeholder={t("newPasswordConfirmationPlaceholder")}
+                          disabled={loadingPassword}
                           type="password"
                           {...field}
                         />
@@ -251,7 +274,11 @@ const Profile = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loadingPassword}
+                >
                   {t("changePasswordButton")}
                 </Button>
               </form>
