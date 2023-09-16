@@ -8,13 +8,10 @@ import LoadingIndicator from "@/components/loading-indicator";
 import axios from "axios";
 import { StoreData } from "@/lib/types";
 import { useAddStoreModal } from "@/hooks/use-add-store-modal";
+import { useLocale } from "next-intl";
 
-export default function MainPage({
-  params: { locale },
-}: {
-  children: React.ReactNode;
-  params: { locale: string };
-}) {
+export default function MainPage() {
+  const locale = useLocale();
   const [store, setStore] = useState<StoreData>();
   const [loading, setLoading] = useState(true);
   const { isOpen, onOpen } = useAddStoreModal();
