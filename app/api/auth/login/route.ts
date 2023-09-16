@@ -52,11 +52,14 @@ export async function POST(req: NextRequest) {
       response.cookies.set({
         name: "userId",
         value: user.id,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
         maxAge: tokenMaxAge,
       }),
       response.cookies.set({
         name: "loggedIn",
         value: "true",
+        secure: process.env.NODE_ENV === "production",
         maxAge: tokenMaxAge,
       }),
     ]);
