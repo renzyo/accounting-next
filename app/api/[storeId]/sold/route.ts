@@ -27,7 +27,7 @@ export async function GET(
     const monthlyRevenue: { [key: number]: number } = {};
 
     for (const sale of sales) {
-      const month = sale.createdAt.getMonth();
+      const month = sale.saleDate.getMonth();
       let revenueForSale = 0;
 
       revenueForSale += sale.quantity;

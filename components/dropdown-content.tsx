@@ -7,7 +7,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "./ui/dropdown-menu";
-import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 
