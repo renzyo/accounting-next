@@ -1,5 +1,7 @@
 # Warehouse Management Website
 
+![Warehouse Management](https://socialify.git.ci/renzyo/warehouse-management-next/image?description=1&font=Inter&language=1&name=1&owner=1&pattern=Plus&theme=Auto)
+
 Store Product and Sales Management Website built using Next JS (app directory) and Typescript.
 
 Try the demo [here](https://warehouse.merza.dev/).
