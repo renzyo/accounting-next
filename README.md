@@ -1,5 +1,7 @@
 # Warehouse Management Website
 
+[Showcase Video](docs/warehouse.mp4)
+
 Store Product and Sales Management Website built using Next JS (app directory) and Typescript.
 
 Try the demo [here](https://warehouse.merza.dev/).
