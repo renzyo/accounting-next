@@ -20,6 +20,12 @@ export async function GET(req: NextRequest) {
 
     const stores = await prismadb.store.findFirst();
 
+    if (!stores) {
+      return SuccessResponse({
+        store: null,
+      });
+    }
+
     return SuccessResponse({
       store: {
         id: stores?.id,
