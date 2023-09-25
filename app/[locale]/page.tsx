@@ -48,7 +48,7 @@ export default function MainPage() {
   }
 
   if (store) {
-    redirect(`/${locale}/${store.id}`);
+    redirect(`/en/${store.id}`);
   }
 
   return (

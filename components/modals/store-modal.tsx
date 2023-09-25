@@ -84,7 +84,7 @@ export const StoreModal = () => {
         form.reset();
         storeModalStore.setIsEditing(false);
         storeModalStore.onClose();
-        window.location.assign(`/${response.data.id}`);
+        window.location.assign(`/en/${response.data.id}`);
       }
     } catch (error) {
       toast.error(t("storeError"));
