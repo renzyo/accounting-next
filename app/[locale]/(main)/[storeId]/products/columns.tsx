@@ -1,11 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 import { CellAction } from "./cell-action";
 import Image from "next/image";
 import TableHeader from "@/components/table-header";
+import ProductImage from "./product-image";
 
 export type ProductColumn = {
   id: string;
@@ -35,15 +34,10 @@ export const ProductColumns: ColumnDef<ProductColumn>[] = [
       }
 
       return (
-        <div className="flex items-center justify-center">
-          <Image
-            src={row.original.image ?? ""}
-            width={200}
-            height={200}
-            alt="Product Image"
-            className="w-20 h-20 rounded-lg"
-          />
-        </div>
+        <ProductImage
+          imageUrl={row.original.image}
+          productName={row.original.name}
+        />
       );
     },
   },

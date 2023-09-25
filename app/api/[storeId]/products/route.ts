@@ -9,23 +9,6 @@ export async function GET(
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const userId = req.cookies.get("userId")?.value;
-
-    const user = await prismadb.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
-
-    if (
-      !userId ||
-      (user?.role !== "ADMIN" && user?.role !== "PRODUCT_MANAGER")
-    ) {
-      return UnauthorizedError({
-        message: "You are not authorized to access this resource.",
-      });
-    }
-
     const products = await prismadb.product.findMany({
       where: {
         storeId: params.storeId as string,
